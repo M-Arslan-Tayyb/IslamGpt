@@ -1,5 +1,14 @@
 import logo from '../assets/images/general/finalLogo.png'
-import bgImage from '../assets/images/general/Login-bg-img.webp'
+// import bgImage from '../assets/images/general/Login-bg-img.webp'
+// import bgImage from '../assets/images/mosques/mosImage1.svg'
+// import bgImage from '../assets/images/mosques/mosImage2.svg'
+// import bgImage from '../assets/images/mosques/mosImage3.svg'
+// import bgImage from '../assets/images/mosques/mosImage4.png'
+// import bgImage from '../assets/images/mosques/mosImage5.svg'
+// import bgImage from '../assets/images/mosques/mosImage7.svg'
+import bgImage from '../assets/images/mosques/mosImage8.png'
+
+
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
@@ -37,7 +46,7 @@ const Login = () => {
         <div className="min-h-screen flex flex-col lg:flex-row">
             {/* Background Image Section */}
             <div
-                className="hidden lg:block lg:w-1/2 bg-cover bg-center"
+                className="hidden lg:block lg:w-1/2 bg-cover bg-center ml-4 "
                 style={{ backgroundImage: `url(${bgImage})` }}
             />
 

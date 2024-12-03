@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import logo from '../assets/images/general/finalLogo.png'
-import bgImage from '../assets/images/general/Login-bg-img.webp'
+// import bgImage from '../assets/images/general/Login-bg-img.webp'
+import bgImage from '../assets/images/mosques/mosImage7.svg'
 import { useSignUpMutation } from '../apis/Auth/authApi'
 import toast from 'react-hot-toast/headless'
 
@@ -55,7 +56,7 @@ const Signup = () => {
         <div className="min-h-screen flex flex-col lg:flex-row">
             {/* Background Image Section */}
             <div
-                className="hidden lg:block lg:w-1/2 bg-cover bg-center"
+                className="hidden lg:block lg:w-1/2 bg-cover bg-center ml-6 mt-6"
                 style={{ backgroundImage: `url(${bgImage})` }}
             />
 
