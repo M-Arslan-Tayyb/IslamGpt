@@ -1,47 +1,158 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom"
+import { RouterProvider, createBrowserRouter, Navigate } from "react-router-dom"
 import AppLayout from "./layout/AppLayout"
+import DashboardLayout from "./layout/DashboardLayout"
 import ErrorBoundary from "./components/common/ErrorBoundry"
-import Home from "./pages/DashBoard"
 import Login from "./pages/Login"
 import Signup from "./pages/Signup"
 import DashBoard from "./pages/DashBoard"
+import ForgotPass from "./pages/Forgot-Pass"
+import Chat from "./pages/Chat"
+import VerifyOtp from "./pages/VerifyOtp"
+import ResetPassword from "./pages/ResetPassword"
+import PrivateRoute from "./components/core/Auth/PrivateRoute"
+import OpenRoute from "./components/core/Auth/OpenRoute"
+import DashboardRoute from "./components/core/Auth/DashboardRoute"
 
 function App() {
   const router = createBrowserRouter([
     {
-      element: <AppLayout />,
+      element: <DashboardLayout />,
       children: [
         {
           path: "/",
+          element: <Navigate to="/dashboard" replace />,
+        },
+        {
+          path: "/dashboard",
           element: (
-            <ErrorBoundary>
-              <DashBoard />
-            </ErrorBoundary>
+            <DashboardRoute>
+              <ErrorBoundary>
+                <DashBoard />
+              </ErrorBoundary>
+            </DashboardRoute>
           ),
         },
-        // Add more routes that should use AppLayout here
+        {
+          path: "/learn-islam",
+          element: (
+            <PrivateRoute>
+              <ErrorBoundary>
+                {/* <LearnIslam /> */}
+              </ErrorBoundary>
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: "/events",
+          element: (
+            <PrivateRoute>
+              <ErrorBoundary>
+                {/* <Events /> */}
+              </ErrorBoundary>
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: "/prayer-time",
+          element: (
+            <PrivateRoute>
+              <ErrorBoundary>
+                {/* <PrayerTime /> */}
+              </ErrorBoundary>
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: "/ai",
+          element: (
+            <PrivateRoute>
+              <ErrorBoundary>
+                {/* <ShahadaAI /> */}
+              </ErrorBoundary>
+            </PrivateRoute>
+          ),
+        },
       ]
+    },
+    // Routes without sidebar
+    {
+      path: "/chat",
+      element: (
+        <PrivateRoute>
+          <ErrorBoundary>
+            <Chat />
+          </ErrorBoundary>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/nearby-places",
+      element: (
+        <PrivateRoute>
+          <ErrorBoundary>
+            {/* <NearbyPlaces /> */}
+          </ErrorBoundary>
+        </PrivateRoute>
+      ),
     },
     {
       path: "/login",
       element: (
-        <ErrorBoundary>
-          <Login />
-        </ErrorBoundary>
+        <OpenRoute>
+          <ErrorBoundary>
+            <Login />
+          </ErrorBoundary>
+        </OpenRoute>
+      ),
+    },
+    {
+      path: "/forgot-password",
+      element: (
+        <OpenRoute>
+          <ErrorBoundary>
+            <ForgotPass />
+          </ErrorBoundary>
+        </OpenRoute>
       ),
     },
     {
       path: "/signup",
       element: (
-        <ErrorBoundary>
-          <Signup />
-        </ErrorBoundary>
+        <OpenRoute>
+          <ErrorBoundary>
+            <Signup />
+          </ErrorBoundary>
+        </OpenRoute>
       ),
     },
-    // You can add more routes that don't use AppLayout here
+    {
+      path: "/verify-otp",
+      element: (
+        <OpenRoute>
+          <ErrorBoundary>
+            <VerifyOtp />
+          </ErrorBoundary>
+        </OpenRoute>
+      ),
+    },
+    {
+      path: "/reset-password",
+      element: (
+        <OpenRoute>
+          <ErrorBoundary>
+            <ResetPassword />
+          </ErrorBoundary>
+        </OpenRoute>
+      ),
+    },
+    {
+      path: "*",
+      element: <Navigate to="/dashboard" replace />,
+    },
   ]);
 
   return <RouterProvider router={router} />
 }
 
 export default App
+
