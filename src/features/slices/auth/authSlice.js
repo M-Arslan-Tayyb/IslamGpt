@@ -13,7 +13,6 @@ const initialState = {
   token: localStorage.getItem(TOKEN_KEY)
     ? decrypt(localStorage.getItem(TOKEN_KEY))
     : null,
-  //   signupData: null,
 };
 
 const authSlice = createSlice({
@@ -22,35 +21,14 @@ const authSlice = createSlice({
   reducers: {
     setToken(state, action) {
       state.token = action.payload;
-      // localStorage.setItem("token", JSON.stringify(action.payload));
     },
-    // setSignupData(state, action) {
-    //   state.signupData = action.payload;
-    // },
-    // clearUserData: (state) => {
-    //   state.token = null;
-    //   state.signupData = null;
-    //   state.followers = [];
-    //   state.following = [];
-    //   localStorage.removeItem("token");
-    //   localStorage.removeItem("followers");
-    //   localStorage.removeItem("following");
-    // },
-    // eslint-disable-next-line no-unused-vars
-    // logout: (state) => {
-    //   // This will reset the entire state to initial values
-    //   return initialState;
-    // },
+    clearToken(state) {
+      state.token = null;
+      localStorage.removeItem(TOKEN_KEY);
+    },
   },
 });
 
-export const {
-  setToken,
-  //   setSignupData,
-  //   setFollowers,
-  //   setFollowing,
-  //   clearUserData,
-  //   logout,
-} = authSlice.actions;
+export const { setToken, clearToken } = authSlice.actions;
 
 export default authSlice.reducer;

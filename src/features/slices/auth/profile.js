@@ -20,18 +20,14 @@ const profileSlice = createSlice({
   reducers: {
     setUser(state, action) {
       state.user = action.payload;
-      // localStorage.setItem("user", JSON.stringify(action.payload));
     },
     clearUser(state) {
       state.user = null;
-      localStorage.removeItem("user");
-    },
-    clearProfile: (state) => {
-      return initialState;
+      localStorage.removeItem(USER_KEY);
     },
   },
 });
 
-export const { setUser, clearUser, clearProfile } = profileSlice.actions;
+export const { setUser, clearUser } = profileSlice.actions;
 
 export default profileSlice.reducer;
