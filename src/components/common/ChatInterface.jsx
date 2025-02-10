@@ -1,19 +1,67 @@
 import React, { useState } from "react";
 import { Send } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import decorate_image from "../../assets/images/dashboard/decorate.svg";
 
-const ChatInterface = ({ userName = "Guest" }) => {
+const ChatInterface = ({
+  userName = "Guest",
+  onAskQuestion,
+  isCompact = false,
+}) => {
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!message.trim()) return;
+
+    const payload = {
+      query: message.trim(),
+      user_id: "user123", // Replace with actual user ID from your auth system
+      session_id: "session123", // Replace with actual session ID
+    };
+
+    if (onAskQuestion) {
+      // If onAskQuestion is provided (on Chat page), call it
+      onAskQuestion(payload);
+    } else {
+      // If not provided (on Dashboard), navigate to Chat page
+      navigate("/chat", { state: { payload } });
+    }
+
     setMessage("");
   };
+
+  if (isCompact) {
+    return (
+      <div className="w-full mx-auto bg-white rounded-lg shadow-md p-4">
+        <form onSubmit={handleSubmit} className="relative">
+          <input
+            type="text"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Ask a follow-up question..."
+            className="w-full px-4 py-3 pr-12 rounded-lg border border-gray-200 focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] outline-none transition-colors"
+          />
+          <button
+            type="submit"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-[var(--primary-color)] hover:text-[var(--secondary-color)] rounded-full transition-colors duration-300"
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-md pb-6">
       <div className="relative">
-        <img src={decorate_image} alt="" className="w-full object-cover" />
+        <img
+          src={decorate_image || "/placeholder.svg"}
+          alt=""
+          className="w-full object-cover"
+        />
       </div>
       <div className="text-center p-16">
         <h2 className="text-2xl font-semibold text-gray-800 mb-2">

@@ -14,6 +14,10 @@ export const dashboard_endpoints = {
   AYAH_HADITH_API: BASE_URL + "/fetch-ayah-hadith",
 };
 
+export const chat_endpoints = {
+  GENERATE_AI: BASE_URL + "/generate",
+};
+
 export const localStorage_values = {
   TOKEN_KEY: "islamgpt_token",
   USER_KEY: "islamgpt_user",
