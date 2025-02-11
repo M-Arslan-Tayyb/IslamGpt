@@ -7,13 +7,6 @@ import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import { useGenerateAIMutation } from "../apis/chat/chatApi";
 
-// Static resource list (replace with your actual data)
-const staticResourceList = [
-  { id: 1, title: "Introduction to Islam", type: "Article" },
-  { id: 2, title: "The Five Pillars of Islam", type: "Video" },
-  { id: 3, title: "Understanding the Quran", type: "Book" },
-];
-
 const Chat = () => {
   const location = useLocation();
   const [currentQuery, setCurrentQuery] = useState(null);
@@ -21,8 +14,8 @@ const Chat = () => {
   const generateAIMutation = useGenerateAIMutation();
 
   useEffect(() => {
-    if (location.state?.payload) {
-      handleAskQuestion(location.state.payload.query);
+    if (location.state?.query) {
+      handleAskQuestion(location.state.query);
     }
   }, [location.state]);
 
@@ -30,7 +23,21 @@ const Chat = () => {
     setCurrentQuery(query);
     try {
       const response = await generateAIMutation.mutateAsync(query);
-      setRelatedContent(response.data.related_content);
+      const { data } = response;
+
+      // Combine Quran and Hadith data for RelatedContent
+      const combinedContent = [
+        ...data.quran.map((item) => ({
+          title: `Quran: Surah ${item.surah_name} (${item.surah_number}:${item.ayah_no})`,
+          description: item.english_trans,
+        })),
+        ...data.hadith.map((item) => ({
+          title: `Hadith: ${item.hadith_book_name}`,
+          description: item.hadith_english,
+        })),
+      ];
+
+      setRelatedContent(combinedContent);
     } catch (error) {
       console.error("Failed to generate response:", error);
     }
@@ -46,7 +53,8 @@ const Chat = () => {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
-                <ResourceList resources={staticResourceList} />
+                <ResourceList resources={[]} />{" "}
+                {/* You may want to populate this based on the API response */}
                 <div className="mt-6">
                   <ChatInterface
                     onAskQuestion={handleAskQuestion}

@@ -10,7 +10,7 @@ export function useGenerateAIMutation() {
     mutationFn: (query) => {
       const payload = {
         query,
-        user_id: "1", // Random user_id
+        user_id: "1", // Replace with actual user ID from your auth system
         session_id: crypto.randomUUID(), // Random session_id
       };
       return apiConnector("POST", GENERATE_AI, payload);

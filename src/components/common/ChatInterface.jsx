@@ -15,23 +15,15 @@ const ChatInterface = ({
     e.preventDefault();
     if (!message.trim()) return;
 
-    const payload = {
-      query: message.trim(),
-      user_id: "user123", // Replace with actual user ID from your auth system
-      session_id: "session123", // Replace with actual session ID
-    };
-
     if (onAskQuestion) {
-      // If onAskQuestion is provided (on Chat page), call it
-      onAskQuestion(payload);
+      // If onAskQuestion is provided (on Chat page), call it with just the query
+      onAskQuestion(message.trim());
     } else {
-      // If not provided (on Dashboard), navigate to Chat page
-      navigate("/chat", { state: { payload } });
+      navigate("/chat", { state: { query: message.trim() } });
     }
 
     setMessage("");
   };
-
   if (isCompact) {
     return (
       <div className="w-full mx-auto bg-white rounded-lg shadow-md p-4">

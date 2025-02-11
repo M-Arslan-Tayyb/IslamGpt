@@ -10,7 +10,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">

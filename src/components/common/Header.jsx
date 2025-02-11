@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { MapPin, ArrowLeft } from "lucide-react";
 import { useSelector } from "react-redux";
+// Import useLogout hook
+
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -43,36 +45,33 @@ const Header = () => {
   return (
     <header className="bg-white border-b border-gray-200 fixed w-full top-0 z-50">
       <div className="container mx-auto px-4 flex justify-between items-center h-16">
-        {/* Left Section */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-4">
           {/* Back Button for Chat Page */}
           {isChat && (
             <Button
               variant="ghost"
               onClick={() => navigate(-1)}
-              className="mr-2 hover:bg-gray-100"
+              className="hover:bg-gray-100"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
           )}
 
-          {/* Logo */}
-          <div className="flex items-center">
-            <Link to="/dashboard" className="flex items-center">
-              <img
-                src={logo || "/placeholder.svg"}
-                alt="Islam GPT logo"
-                className="h-14 w-16"
-              />
-              <span className="text-[var(--primary-color)] text-xl font-semibold relative right-[10px] top-[2px]">
-                IslamGPT
-              </span>
-            </Link>
-          </div>
+          {/* Logo - Single Instance */}
+          <Link to="/dashboard" className="flex items-center">
+            <img
+              src={logo || "/placeholder.svg"}
+              alt="Islam GPT logo"
+              className="h-14 w-16"
+            />
+            <span className="text-[var(--primary-color)] text-xl font-semibold relative right-[10px] top-[2px]">
+              IslamGPT
+            </span>
+          </Link>
 
-          {/* Date and Location - Only show on Dashboard */}
+          {/* Date and Location - Only on Dashboard */}
           {!isChat && (
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-center gap-4">
               <div className="text-sm">
                 <p className="text-gray-600 text-xs">{gregorianDate}</p>
                 <p className="text-[var(--text-color)] text-xs font-bold">
@@ -90,7 +89,7 @@ const Header = () => {
           )}
         </div>
 
-        {/* Right Section: Login or User Profile */}
+        {/* User Profile/Login Section */}
         <div className="flex items-center">
           {!token ? (
             <Link
@@ -104,7 +103,7 @@ const Header = () => {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center space-x-2 bg-gray-100"
+                  className="flex items-center gap-2 bg-gray-100"
                 >
                   <div className="h-8 w-8 flex items-center justify-center bg-gray-200 text-gray-700 rounded-full">
                     {user?.firstName?.charAt(0)}
@@ -117,7 +116,7 @@ const Header = () => {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem className="flex items-center space-x-2">
+                <DropdownMenuItem className="flex items-center gap-2">
                   <div className="h-8 w-8 flex items-center justify-center bg-gray-200 text-gray-700 rounded-full">
                     {user?.firstName?.charAt(0)}
                     {user?.lastName?.charAt(0)}
