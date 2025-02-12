@@ -1,7 +1,11 @@
 import React from "react";
 import { Heart, Share2 } from "lucide-react";
+import LoadingSkeleton from "@/components/common/LoadingSkelton";
 
-const ResourceList = ({ query, aiResponse }) => {
+const ResourceList = ({ query, aiResponse, isLoading }) => {
+  if (isLoading) {
+    return <LoadingSkeleton />;
+  }
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <div className="flex items-center justify-between mb-6">

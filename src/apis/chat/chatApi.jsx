@@ -7,13 +7,14 @@ const { GENERATE_AI } = chat_endpoints;
 
 export function useGenerateAIMutation() {
   return useMutation({
-    mutationFn: (query) => {
+    mutationFn: async (query) => {
       const payload = {
         query,
-        user_id: "1", // Replace with actual user ID from your auth system
-        session_id: crypto.randomUUID(), // Random session_id
+        user_id: "1",
+        session_id: crypto.randomUUID(),
       };
-      return apiConnector("POST", GENERATE_AI, payload);
+      const response = await apiConnector("POST", GENERATE_AI, payload);
+      return response;
     },
     onMutate: () => {
       //   toast.loading("Generating response...");

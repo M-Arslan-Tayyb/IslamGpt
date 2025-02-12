@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
+import LoadingSkeleton from "@/components/common/LoadingSkelton";
 import ChatInterface from "../components/common/ChatInterface";
 import ResourceList from "../components/core/chat/ResourceList";
 import RelatedContent from "../components/core/chat/RelatedContent";
@@ -9,25 +8,8 @@ import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import { useGenerateAIMutation } from "../apis/chat/chatApi";
 
-const LoadingSkeleton = () => (
-  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div className="lg:col-span-2">
-      <div className="bg-white rounded-lg p-6">
-        <Skeleton height={32} width={200} className="mb-4" />
-        <Skeleton height={100} className="mb-4" />
-        <Skeleton height={50} className="mb-2" />
-      </div>
-    </div>
-    <div className="lg:col-span-1">
-      <div className="bg-white rounded-lg p-6">
-        <Skeleton height={32} width={150} className="mb-4" />
-        <Skeleton height={400} />
-      </div>
-    </div>
-  </div>
-);
-
 const Chat = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
   const [currentQuery, setCurrentQuery] = useState(null);
   const [aiResponse, setAiResponse] = useState(null);
@@ -79,7 +61,11 @@ const Chat = () => {
       return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <ResourceList query={currentQuery} aiResponse={aiResponse} />
+            <ResourceList
+              query={currentQuery}
+              aiResponse={aiResponse}
+              isLoading={isLoading}
+            />
             <div className="mt-6">
               <ChatInterface
                 onAskQuestion={handleAskQuestion}
@@ -88,7 +74,7 @@ const Chat = () => {
             </div>
           </div>
           <div className="lg:col-span-1">
-            <RelatedContent content={relatedContent} />
+            <RelatedContent content={relatedContent} isLoading={isLoading} />
           </div>
         </div>
       );

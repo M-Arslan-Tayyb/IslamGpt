@@ -5,10 +5,12 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import LoadingSkeleton from "@/components/common/LoadingSkelton";
 
 const MetadataBadge = ({ children }) => (
   <Badge
@@ -39,7 +41,7 @@ const ContentCard = ({ item, type }) => {
         className="bg-white hover:bg-gray-50 rounded-lg p-4 cursor-pointer transition-all border border-gray-100 hover:border-[var(--primary-color)] hover:shadow-sm"
       >
         <div className="flex items-start gap-3 mb-3">
-          <div className="text-[var(--primary-color)] bg-opacity-10 px-3 py-1 rounded text-sm font-medium text-[var(--primary-color)]">
+          <div className="bg-[var(--text-bg-hover)] bg-opacity-10 px-3 py-1 rounded text-sm font-medium text-[var(--primary-color)]">
             {type}
           </div>
         </div>
@@ -66,14 +68,11 @@ const ContentCard = ({ item, type }) => {
                 >
                   <Maximize2 className="h-4 w-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                <DialogClose asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <X className="h-4 w-4" />
+                  </Button>
+                </DialogClose>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -124,8 +123,11 @@ const ContentCard = ({ item, type }) => {
   );
 };
 
-const RelatedContent = ({ content }) => {
+const RelatedContent = ({ content, isLoading }) => {
   const [activeTab, setActiveTab] = useState("all");
+  if (isLoading) {
+    return <LoadingSkeleton />;
+  }
 
   if (!content || content.length === 0) {
     return null;
