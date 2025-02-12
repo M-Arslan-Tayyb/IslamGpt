@@ -16,16 +16,21 @@ export function useGenerateAIMutation() {
       return apiConnector("POST", GENERATE_AI, payload);
     },
     onMutate: () => {
-      toast.loading("Generating response...");
+      //   toast.loading("Generating response...");
     },
     onSuccess: (response) => {
+      console.log("API Response:", response.data);
       toast.dismiss();
-      if (!response.data.success) {
+
+      if (response.data.success === false) {
+        // Explicitly check for false
         throw new Error(response.data.message || "Failed to generate response");
       }
+
       toast.success("Response generated successfully");
       return response.data;
     },
+
     onError: (error) => {
       toast.dismiss();
       console.error("GENERATE AI ERROR:", error);
