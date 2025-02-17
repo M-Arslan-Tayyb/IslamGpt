@@ -1,17 +1,21 @@
-import { RouterProvider, createBrowserRouter, Navigate } from "react-router-dom"
-import AppLayout from "./layout/AppLayout"
-import DashboardLayout from "./layout/DashboardLayout"
-import ErrorBoundary from "./components/common/ErrorBoundry"
-import Login from "./pages/Login"
-import Signup from "./pages/Signup"
-import DashBoard from "./pages/DashBoard"
-import ForgotPass from "./pages/Forgot-Pass"
-import Chat from "./pages/Chat"
-import VerifyOtp from "./pages/VerifyOtp"
-import ResetPassword from "./pages/ResetPassword"
-import PrivateRoute from "./components/core/Auth/PrivateRoute"
-import OpenRoute from "./components/core/Auth/OpenRoute"
-import DashboardRoute from "./components/core/Auth/DashboardRoute"
+import {
+  RouterProvider,
+  createBrowserRouter,
+  Navigate,
+} from "react-router-dom";
+import AppLayout from "./layout/AppLayout";
+import DashboardLayout from "./layout/DashboardLayout";
+import ErrorBoundary from "./components/common/ErrorBoundry";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import DashBoard from "./pages/DashBoard";
+import ForgotPass from "./pages/Forgot-Pass";
+import Chat from "./pages/Chat";
+import VerifyOtp from "./pages/VerifyOtp";
+import ResetPassword from "./pages/ResetPassword";
+import PrivateRoute from "./components/core/Auth/PrivateRoute";
+import OpenRoute from "./components/core/Auth/OpenRoute";
+import DashboardRoute from "./components/core/Auth/DashboardRoute";
 
 function App() {
   const router = createBrowserRouter([
@@ -36,9 +40,7 @@ function App() {
           path: "/learn-islam",
           element: (
             <PrivateRoute>
-              <ErrorBoundary>
-                {/* <LearnIslam /> */}
-              </ErrorBoundary>
+              <ErrorBoundary>{/* <LearnIslam /> */}</ErrorBoundary>
             </PrivateRoute>
           ),
         },
@@ -46,9 +48,7 @@ function App() {
           path: "/events",
           element: (
             <PrivateRoute>
-              <ErrorBoundary>
-                {/* <Events /> */}
-              </ErrorBoundary>
+              <ErrorBoundary>{/* <Events /> */}</ErrorBoundary>
             </PrivateRoute>
           ),
         },
@@ -56,9 +56,7 @@ function App() {
           path: "/prayer-time",
           element: (
             <PrivateRoute>
-              <ErrorBoundary>
-                {/* <PrayerTime /> */}
-              </ErrorBoundary>
+              <ErrorBoundary>{/* <PrayerTime /> */}</ErrorBoundary>
             </PrivateRoute>
           ),
         },
@@ -66,13 +64,11 @@ function App() {
           path: "/ai",
           element: (
             <PrivateRoute>
-              <ErrorBoundary>
-                {/* <ShahadaAI /> */}
-              </ErrorBoundary>
+              <ErrorBoundary>{/* <ShahadaAI /> */}</ErrorBoundary>
             </PrivateRoute>
           ),
         },
-      ]
+      ],
     },
     // Routes without sidebar
     {
@@ -89,9 +85,7 @@ function App() {
       path: "/nearby-places",
       element: (
         <PrivateRoute>
-          <ErrorBoundary>
-            {/* <NearbyPlaces /> */}
-          </ErrorBoundary>
+          <ErrorBoundary>{/* <NearbyPlaces /> */}</ErrorBoundary>
         </PrivateRoute>
       ),
     },
@@ -151,8 +145,7 @@ function App() {
     },
   ]);
 
-  return <RouterProvider router={router} />
+  return <RouterProvider router={router} />;
 }
 
-export default App
-
+export default App;

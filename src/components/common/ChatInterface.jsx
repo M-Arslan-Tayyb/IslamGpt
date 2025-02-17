@@ -26,8 +26,8 @@ const ChatInterface = ({
   };
   if (isCompact) {
     return (
-      <div className="w-full mx-auto bg-white rounded-lg shadow-md p-4">
-        <form onSubmit={handleSubmit} className="relative">
+      <div className="w-[70%] mx-auto bg-white rounded-lg shadow-md p-4">
+        <form onSubmit={handleSubmit} className="relative ">
           <input
             type="text"
             value={message}

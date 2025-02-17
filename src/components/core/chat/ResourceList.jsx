@@ -6,6 +6,7 @@ const ResourceList = ({ query, aiResponse, isLoading }) => {
   if (isLoading) {
     return <LoadingSkeleton />;
   }
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <div className="flex items-center justify-between mb-6">
@@ -19,12 +20,19 @@ const ResourceList = ({ query, aiResponse, isLoading }) => {
           </button>
         </div>
       </div>
-      {aiResponse && (
+      {aiResponse ? (
         <div className="mb-6">
           <div className="bg-gray-50 rounded-lg p-4">
             <h3 className="font-medium text-gray-900 mb-2">AI Response</h3>
             <p className="text-gray-600">{aiResponse}</p>
           </div>
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Coming Soon
+          </h3>
+          {/* <p className="text-gray-600">We're preparing your response...</p> */}
         </div>
       )}
     </div>
