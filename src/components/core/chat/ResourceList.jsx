@@ -8,7 +8,7 @@ const ResourceList = ({ query, aiResponse, isLoading }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
+    <div className="bg-gray-50 rounded-lg shadow-sm p-6 mb-16">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">{query}</h1>
         <div className="flex gap-2">

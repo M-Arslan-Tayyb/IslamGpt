@@ -4,7 +4,7 @@ const LANDING_PAGE_URL = "https://islam-gpt-landing-page.vercel.app";
 
 const Footer = () => {
   return (
-    <footer className="bg-white border-t border-gray-200 py-4 mt-auto">
+    <footer className="bg-white border-t border-gray-200 py-4 mt-auto mt-10">
       <div className="container mx-auto px-4">
         <div className="flex justify-center items-center space-x-8">
           <a

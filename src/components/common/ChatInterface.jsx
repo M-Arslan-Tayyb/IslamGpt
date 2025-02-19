@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Send } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import decorate_image from "../../assets/images/dashboard/decorate.svg";
 
 const ChatInterface = ({
@@ -10,6 +10,18 @@ const ChatInterface = ({
 }) => {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const chatId = searchParams.get("chatId");
+  const [chatHistory, setChatHistory] = useState([]);
+
+  useEffect(() => {
+    if (chatId) {
+      const storedHistory = localStorage.getItem(`chat_${chatId}`);
+      if (storedHistory) {
+        setChatHistory(JSON.parse(storedHistory));
+      }
+    }
+  }, [chatId]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -24,6 +36,7 @@ const ChatInterface = ({
 
     setMessage("");
   };
+
   if (isCompact) {
     return (
       <div className="w-[70%] mx-auto bg-white rounded-lg shadow-md p-4">
@@ -64,6 +77,18 @@ const ChatInterface = ({
         </p>
       </div>
       <div className="max-w-3xl mx-auto">
+        {chatHistory.length > 0 && (
+          <div className="mb-6 max-h-96 overflow-y-auto">
+            {chatHistory.map((item, index) => (
+              <div key={index} className="mb-4 p-4 bg-gray-50 rounded-lg">
+                <p className="font-semibold text-gray-800 mb-2">
+                  You: {item.query}
+                </p>
+                <p className="text-gray-600">AI: {item.response}</p>
+              </div>
+            ))}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="relative">
           <input
             type="text"
