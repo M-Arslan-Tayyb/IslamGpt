@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import ChatInterface from "../components/common/ChatInterface";
-import ResourceList from "../components/core/chat/ResourceList";
-import RelatedContent from "../components/core/chat/RelatedContent";
-import ChatWrapper from "../components/core/chat/ChatWrapper";
+import ChatMessage from "../components/core/chat/ChatMessage";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import { useGenerateAIMutation } from "../apis/chat/chatApi";
@@ -11,141 +9,121 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 const Chat = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const chatId = searchParams.get("chatId");
+    const location = useLocation();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const chatId = searchParams.get("chatId");
 
-  const [currentQuery, setCurrentQuery] = useState(null);
-  const [aiResponse, setAiResponse] = useState(null);
-  const [relatedContent, setRelatedContent] = useState(null);
-  const [chatHistory, setChatHistory] = useState([]);
-  const generateAIMutation = useGenerateAIMutation();
+    const [chatHistory, setChatHistory] = useState([]);
+    const [currentQuery, setCurrentQuery] = useState(null);
+    const generateAIMutation = useGenerateAIMutation();
+    const chatContainerRef = useRef(null);
 
-  useEffect(() => {
-    if (chatId) {
-      const storedHistory = localStorage.getItem(`chat_${chatId}`);
-      if (storedHistory) {
-        const parsedHistory = JSON.parse(storedHistory);
-        setChatHistory(parsedHistory);
-        if (parsedHistory.length > 0) {
-          const lastItem = parsedHistory[parsedHistory.length - 1];
-          setCurrentQuery(lastItem.query);
-          setAiResponse(lastItem.response);
-          setRelatedContent(lastItem.relatedContent);
+    useEffect(() => {
+        if (chatId) {
+            const storedHistory = localStorage.getItem(`chat_${chatId}`);
+            if (storedHistory) {
+                setChatHistory(JSON.parse(storedHistory));
+            }
+        } else if (location.state?.query) {
+            handleAskQuestion(location.state.query);
         }
-      }
-    } else if (location.state?.query) {
-      handleAskQuestion(location.state.query);
-    }
-  }, [chatId, location.state]);
+    }, [chatId, location.state]);
 
-  const handleAskQuestion = async (query) => {
-    setCurrentQuery(query);
-    setAiResponse(null);
-    setRelatedContent(null);
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [chatHistory, currentQuery]);
 
-    try {
-      const data = await generateAIMutation.mutateAsync(query);
-      setAiResponse(data.data.ai_response);
+    const handleAskQuestion = async (query) => {
+        setCurrentQuery({ query, response: null, relatedContent: null });
 
-      const combinedContent = [
-        ...data.data.quran.map((item) => ({
-          type: "Quran",
-          title: `Quran: Surah ${item.surah_name} (${item.surah_number}:${item.ayah_no})`,
-          description: item.english_trans,
-          ...item,
-        })),
-        ...data.data.hadith.map((item) => ({
-          type: "Hadith",
-          title: `Hadith: ${item.hadith_book_name}`,
-          description: item.hadith_english,
-          ...item,
-        })),
-      ];
-      setRelatedContent(combinedContent);
+        try {
+            const data = await generateAIMutation.mutateAsync(query);
+            const newHistoryItem = {
+                query,
+                response: data.data.ai_response,
+                relatedContent: [
+                    ...data.data.quran.map((item) => ({
+                        type: "Quran",
+                        title: `Quran: Surah ${item.surah_name} (${item.surah_number}:${item.ayah_no})`,
+                        description: item.english_trans,
+                        ...item,
+                    })),
+                    ...data.data.hadith.map((item) => ({
+                        type: "Hadith",
+                        title: `Hadith: ${item.hadith_book_name}`,
+                        description: item.hadith_english,
+                        ...item,
+                    })),
+                ],
+            };
 
-      // Generate a new chatId if it doesn't exist
-      const currentChatId = chatId || generateChatId();
-      if (!chatId) {
-        navigate(`/chat?chatId=${currentChatId}`, { replace: true });
-      }
+            const currentChatId = chatId || generateChatId();
+            if (!chatId) {
+                navigate(`/chat?chatId=${currentChatId}`, { replace: true });
+            }
 
-      // Update chat history
-      const newHistoryItem = {
-        query,
-        response: data.data.ai_response,
-        relatedContent: combinedContent,
-      };
-      const updatedHistory = [...chatHistory, newHistoryItem];
-      setChatHistory(updatedHistory);
-
-      // Save to localStorage
-      localStorage.setItem(
-        `chat_${currentChatId}`,
-        JSON.stringify(updatedHistory)
-      );
-    } catch (error) {
-      console.error("Failed to generate response:", error);
-    }
-  };
-  const renderContent = () => {
-    if (!currentQuery) {
-      return <ChatInterface onAskQuestion={handleAskQuestion} />;
-    }
+            setChatHistory(prevHistory => [...prevHistory, newHistoryItem]);
+            setCurrentQuery(null);
+            localStorage.setItem(`chat_${currentChatId}`, JSON.stringify([...chatHistory, newHistoryItem]));
+        } catch (error) {
+            console.error("Failed to generate response:", error);
+            setCurrentQuery(null);
+        }
+    };
 
     return (
-      <ChatWrapper
-        relatedContent={
-          <RelatedContent
-            content={relatedContent}
-            isLoading={generateAIMutation.isPending}
-          />
-        }
-      >
-        <div className="p-6">
-          {generateAIMutation.isPending ? (
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <Skeleton width={150} height={28} />
-                <div className="flex gap-2">
-                  <Skeleton circle width={32} height={32} />
-                  <Skeleton circle width={32} height={32} />
+        <div className="min-h-screen flex flex-col bg-[var(--bg-gray)]">
+            <Header />
+            <main className="flex-grow pt-16">
+                <div className="container mx-auto px-4 py-8">
+                    <div className="bg-white rounded-lg shadow-md w-full min-h-[85vh] relative">
+                        <div
+                            ref={chatContainerRef}
+                            className="h-[calc(85vh-80px)] overflow-y-auto p-6 smooth-scroll"
+                        >
+                            {chatHistory.map((item, index) => (
+                                <ChatMessage
+                                    key={index}
+                                    query={item.query}
+                                    response={item.response}
+                                    relatedContent={item.relatedContent}
+                                />
+                            ))}
+                            {currentQuery && (
+                                <ChatMessage
+                                    query={currentQuery.query}
+                                    response={null}
+                                    relatedContent={null}
+                                />
+                            )}
+                            {generateAIMutation.isPending && (
+                                <div className="mt-4">
+                                    <Skeleton height={24} width="60%" />
+                                    <Skeleton height={48} />
+                                    <Skeleton height={24} width="40%" />
+                                </div>
+                            )}
+                        </div>
+                        <div className="absolute bottom-0 left-0 w-full border-t border-gray-200 bg-white p-4">
+                            <ChatInterface onAskQuestion={handleAskQuestion} isCompact={true} />
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div className="flex flex-col items-center justify-center py-12">
-                <Skeleton width={120} height={24} className="mb-2" />
-              </div>
-            </div>
-          ) : (
-            <ResourceList query={currentQuery} aiResponse={aiResponse} />
-          )}
+            </main>
+            <Footer />
         </div>
-        <div>
-          <ChatInterface onAskQuestion={handleAskQuestion} isCompact={true} />
-        </div>
-      </ChatWrapper>
     );
-  };
-
-  return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg-gray)]">
-      <Header />
-      <main className="flex-grow pt-16">
-        <div className="container mx-auto px-4 py-8">{renderContent()}</div>
-      </main>
-      <Footer />
-    </div>
-  );
 };
 
 export default Chat;
 
-// Helper function to generate a unique chat ID
 function generateChatId() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
-      v = c == "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+        var r = (Math.random() * 16) | 0,
+            v = c == "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
 }

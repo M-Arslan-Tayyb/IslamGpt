@@ -5,9 +5,18 @@ import CryptoJS from "crypto-js";
 const USER_KEY = localStorage_values.USER_KEY;
 const SECRET_KEY = import.meta.env.VITE_LOCALSTORAGE_SECRET_KEY;
 const decrypt = (cipherText) => {
-  const bytes = CryptoJS.AES.decrypt(cipherText, SECRET_KEY);
-  return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  if (!cipherText) return null; // Avoid errors on empty values
+  try {
+    const bytes = CryptoJS.AES.decrypt(cipherText, SECRET_KEY);
+    const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
+
+    return decryptedText ? JSON.parse(decryptedText) : null;
+  } catch (error) {
+    console.error("Decryption failed:", error);
+    return null;
+  }
 };
+
 const initialState = {
   user: localStorage.getItem(USER_KEY)
     ? decrypt(localStorage.getItem(USER_KEY))

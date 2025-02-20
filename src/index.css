@@ -14,6 +14,74 @@
   --text-gray: #4b5563;
   --text-bg: #ff99002a;
   --text-bg-hover: #ff99003a;
+  
+  /* Scrollbar Custom Properties */
+  --scrollbar-thumb: var(--primary-color);
+  --scrollbar-track: var(--text-bg);
+  --scrollbar-width: 8px;
+}
+
+/* Custom Scrollbar Styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* Webkit Scrollbar Styles */
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-color);
+  cursor: pointer;
+}
+
+dialog-content {
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+.dialog-content-scroll {
+  overflow-y: auto;
+  padding-right: var(--scrollbar-width);
+}
+
+/* Ensure scrollbars are visible in modal content */
+.dialog-content *::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+  display: block;
+}
+
+.dialog-content *::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: var(--scrollbar-width);
+}
+
+.dialog-content *::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: var(--scrollbar-width);
+}
+
+.smooth-scroll {
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbar for mobile devices while maintaining functionality */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
 }
 
 @layer base {
@@ -76,8 +144,14 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+
+    /* Dark mode scrollbar colors */
+    --scrollbar-thumb: var(--primary-color);
+    --scrollbar-track: rgba(255, 255, 255, 0.1);
   }
 }
+
+
 
 @layer base {
   * {

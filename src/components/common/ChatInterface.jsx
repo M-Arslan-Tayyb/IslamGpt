@@ -1,94 +1,47 @@
-import React, { useState, useEffect } from "react";
-import { Send } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import decorate_image from "../../assets/images/dashboard/decorate.svg";
+import React, { useState } from "react";
+import { Send } from 'lucide-react';
 
-const ChatInterface = ({
-  userName = "Guest",
-  onAskQuestion,
-  isCompact = false,
-}) => {
+const ChatInterface = ({ onAskQuestion, isCompact = false }) => {
   const [message, setMessage] = useState("");
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const chatId = searchParams.get("chatId");
-  const [chatHistory, setChatHistory] = useState([]);
-
-  useEffect(() => {
-    if (chatId) {
-      const storedHistory = localStorage.getItem(`chat_${chatId}`);
-      if (storedHistory) {
-        setChatHistory(JSON.parse(storedHistory));
-      }
-    }
-  }, [chatId]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!message.trim()) return;
-
-    if (onAskQuestion) {
-      // If onAskQuestion is provided (on Chat page), call it with just the query
-      onAskQuestion(message.trim());
-    } else {
-      navigate("/chat", { state: { query: message.trim() } });
-    }
-
+    onAskQuestion(message.trim());
     setMessage("");
   };
 
   if (isCompact) {
     return (
-      <div className="w-[70%] mx-auto bg-white rounded-lg shadow-md p-4">
-        <form onSubmit={handleSubmit} className="relative ">
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Ask a follow-up question..."
-            className="w-full px-4 py-3 pr-12 rounded-lg border border-gray-200 focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] outline-none transition-colors"
-          />
-          <button
-            type="submit"
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-[var(--primary-color)] hover:text-[var(--secondary-color)] rounded-full transition-colors duration-300"
-          >
-            <Send className="w-5 h-5" />
-          </button>
-        </form>
-      </div>
+      <form onSubmit={handleSubmit} className="relative">
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Ask a follow-up question..."
+          className="w-full px-4 py-3 pr-12 rounded-lg border border-gray-200 focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] outline-none transition-colors"
+        />
+        <button
+          type="submit"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-[var(--primary-color)] hover:text-[var(--secondary-color)] rounded-full transition-colors duration-300"
+        >
+          <Send className="w-5 h-5" />
+        </button>
+      </form>
     );
   }
 
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-md pb-6">
-      <div className="relative">
-        <img
-          src={decorate_image || "/placeholder.svg"}
-          alt=""
-          className="w-full object-cover"
-        />
-      </div>
       <div className="text-center p-16">
         <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-          Salaam, {userName}
+          Salaam, Guest
         </h2>
         <p className="text-gray-600">
           Got questions? Just ask IslamGpt for Islamic authentic insights.
         </p>
       </div>
       <div className="max-w-3xl mx-auto">
-        {chatHistory.length > 0 && (
-          <div className="mb-6 max-h-96 overflow-y-auto">
-            {chatHistory.map((item, index) => (
-              <div key={index} className="mb-4 p-4 bg-gray-50 rounded-lg">
-                <p className="font-semibold text-gray-800 mb-2">
-                  You: {item.query}
-                </p>
-                <p className="text-gray-600">AI: {item.response}</p>
-              </div>
-            ))}
-          </div>
-        )}
         <form onSubmit={handleSubmit} className="relative">
           <input
             type="text"
