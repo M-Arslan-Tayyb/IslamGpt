@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import ChatInterface from "../components/common/ChatInterface";
-import ChatMessage from "../components/core/chat/ChatMessage";
+import ChatMessage from "../components/core/chat/chatMessage";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import { useGenerateAIMutation } from "../apis/chat/chatApi";
