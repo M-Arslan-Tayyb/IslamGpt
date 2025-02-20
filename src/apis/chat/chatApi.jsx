@@ -29,7 +29,7 @@ export function useGenerateAIMutation() {
         throw new Error(data.message || "Failed to generate response");
       }
 
-      toast.success("Response generated successfully");
+      // toast.success("Response generated successfully");
       return data;
     },
     onError: (error) => {
