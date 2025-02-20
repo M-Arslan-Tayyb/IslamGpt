@@ -107,7 +107,9 @@ const Chat = () => {
                                 </div>
                             )}
                         </div>
+
                         <div className="absolute bottom-0 left-0 w-full border-t border-gray-200 bg-white p-4">
+                            {console.log("handleAskQuestion exists?", typeof handleAskQuestion)}
                             <ChatInterface onAskQuestion={handleAskQuestion} isCompact={true} />
                         </div>
                     </div>

@@ -19,7 +19,7 @@ export function useGenerateAIMutation() {
     onMutate: () => {
       console.log("Mutation started");
       toast.dismiss(); // Dismiss any existing toasts
-      toast.loading("Generating response...");
+      // toast.loading("Generating response...");
     },
     onSuccess: (data) => {
       console.log("API Response:", data);
