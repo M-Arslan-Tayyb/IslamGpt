@@ -1,7 +1,12 @@
 import React, { useState } from "react";
-import { Send } from 'lucide-react';
+import { Send } from "lucide-react";
+import decorate_image from "../../assets/images/dashboard/decorate.svg";
 
-const ChatInterface = ({ onAskQuestion, isCompact = false }) => {
+const ChatInterface = ({
+  onAskQuestion,
+  isCompact = false,
+  showInitial = true,
+}) => {
   const [message, setMessage] = useState("");
 
   const handleSubmit = (e) => {
@@ -11,14 +16,15 @@ const ChatInterface = ({ onAskQuestion, isCompact = false }) => {
     setMessage("");
   };
 
-  if (isCompact) {
+  // Show compact version only when explicitly requested AND not showing initial interface
+  if (isCompact && !showInitial) {
     return (
       <form onSubmit={handleSubmit} className="relative">
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Ask a follow-up question..."
+          placeholder="Ask your question..."
           className="w-full px-4 py-3 pr-12 rounded-lg border border-gray-200 focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] outline-none transition-colors"
         />
         <button
@@ -31,8 +37,16 @@ const ChatInterface = ({ onAskQuestion, isCompact = false }) => {
     );
   }
 
+  // Show full interface for initial state or when compact is false
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-md pb-6">
+      <div className="relative">
+        <img
+          src={decorate_image || "/placeholder.svg"}
+          alt=""
+          className="w-full object-cover"
+        />
+      </div>
       <div className="text-center p-16">
         <h2 className="text-2xl font-semibold text-gray-800 mb-2">
           Salaam, Guest

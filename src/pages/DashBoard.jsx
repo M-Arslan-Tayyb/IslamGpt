@@ -4,16 +4,23 @@ import Footer from "../components/common/Footer";
 import ChatInterface from "../components/common/ChatInterface";
 import DailyCards from "../components/core/dashboard/DailyCards";
 import { useDailyContent } from "../apis/dashboard/dashbaordApi";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const { data: dailyContent, isLoading, isError } = useDailyContent();
+  const navigate = useNavigate();
+
+  const handleAskQuestion = (query) => {
+    // Navigate to the chat page with the query
+    navigate("/chat", { state: { query } });
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
-            <ChatInterface />
+            <ChatInterface onAskQuestion={handleAskQuestion} />
           </div>
 
           {isLoading ? (

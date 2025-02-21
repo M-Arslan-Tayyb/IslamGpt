@@ -8,9 +8,9 @@ const ResourceList = ({ query, aiResponse, isLoading }) => {
   }
 
   return (
-    <div className="bg-gray-50 rounded-lg shadow-sm p-6 mb-16">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">{query}</h1>
+    <div className="bg-gray-50 rounded-lg shadow-sm p-6">
+      <div className="flex justify-end mb-6">
+        {/* <h1 className="text-2xl font-semibold text-gray-900">{query}</h1> */}
         <div className="flex gap-2">
           <button className="p-2 hover:bg-gray-100 rounded-full">
             <Heart className="w-5 h-5 text-gray-600" />
@@ -22,7 +22,7 @@ const ResourceList = ({ query, aiResponse, isLoading }) => {
       </div>
       {aiResponse ? (
         <div className="mb-6">
-          <div className="bg-gray-50 rounded-lg p-4">
+          <div className="bg-white rounded-lg p-4">
             <h3 className="font-medium text-gray-900 mb-2">AI Response</h3>
             <p className="text-gray-600">{aiResponse}</p>
           </div>
@@ -32,7 +32,6 @@ const ResourceList = ({ query, aiResponse, isLoading }) => {
           <h3 className="text-lg font-medium text-gray-900 mb-2">
             Coming Soon
           </h3>
-          {/* <p className="text-gray-600">We're preparing your response...</p> */}
         </div>
       )}
     </div>

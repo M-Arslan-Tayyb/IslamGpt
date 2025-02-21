@@ -45,7 +45,9 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
         onClick={() => setIsModalOpen(true)}
         className="bg-white hover:bg-[var(--text-bg)] rounded-lg p-3 cursor-pointer transition-all border border-gray-200 hover:border-[var(--primary-color)] hover:shadow-sm"
       >
-        <p className="text-sm text-gray-600">{truncateText(item.description)}</p>
+        <p className="text-sm text-gray-600">
+          {truncateText(item.description)}
+        </p>
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -80,7 +82,9 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
                     Chapter: {item.hadith_chapter_english}
                   </MetadataBadge>
                   <MetadataBadge>Book: {item.hadith_book_name}</MetadataBadge>
-                  <MetadataBadge>Reference: {item.hadith_reference}</MetadataBadge>
+                  <MetadataBadge>
+                    Reference: {item.hadith_reference}
+                  </MetadataBadge>
                 </>
               ) : (
                 <>
@@ -101,7 +105,9 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <h4 className="font-medium text-gray-900">English Translation</h4>
+                  <h4 className="font-medium text-gray-900">
+                    English Translation
+                  </h4>
                   <p className="text-gray-600 leading-relaxed">
                     {item.description}
                   </p>
@@ -129,10 +135,11 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
                     <div
                       key={idx}
                       onClick={() => onNavigate(idx)}
-                      className={`p-3 rounded-lg cursor-pointer transition-all ${idx === currentIndex
-                        ? "bg-[var(--primary-color)] text-white"
-                        : "bg-white hover:bg-[var(--text-bg)]"
-                        }`}
+                      className={`p-3 rounded-lg cursor-pointer transition-all ${
+                        idx === currentIndex
+                          ? "bg-[var(--primary-color)] text-white"
+                          : "bg-white hover:bg-[var(--text-bg)]"
+                      }`}
                     >
                       <p className="text-sm">
                         {truncateText(content.description, 60)}
@@ -148,7 +155,6 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
   );
 };
 
-
 const RelatedContent = ({ content, isLoading }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -156,12 +162,9 @@ const RelatedContent = ({ content, isLoading }) => {
     return <LoadingSkeleton />;
   }
 
-  if (!content || content.length === 0) {
+  if (!content || (content.quran.length === 0 && content.hadith.length === 0)) {
     return null;
   }
-
-  const quranContent = content.filter((item) => item.type === "Quran");
-  const hadithContent = content.filter((item) => item.type === "Hadith");
 
   const handleNavigate = (newIndex) => {
     setSelectedIndex(newIndex);
@@ -170,7 +173,7 @@ const RelatedContent = ({ content, isLoading }) => {
   return (
     <div className="bg-[var(--text-bg)] rounded-lg">
       <Accordion type="single" collapsible className="px-4 py-2">
-        {quranContent.length > 0 && (
+        {content.quran.length > 0 && (
           <AccordionItem value="quran" className="border-b-0">
             <AccordionTrigger className="hover:no-underline py-2 px-3 rounded-lg hover:bg-[var(--text-bg-hover)]">
               <div className="flex items-center gap-2 text-[var(--primary-color)]">
@@ -180,12 +183,12 @@ const RelatedContent = ({ content, isLoading }) => {
             </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-2 mt-2">
-                {quranContent.map((item, index) => (
+                {content.quran.map((item, index) => (
                   <ContentCard
                     key={index}
                     item={item}
                     type="Quran"
-                    allContent={content}
+                    allContent={[...content.quran, ...content.hadith]}
                     currentIndex={selectedIndex}
                     onNavigate={handleNavigate}
                   />
@@ -194,7 +197,7 @@ const RelatedContent = ({ content, isLoading }) => {
             </AccordionContent>
           </AccordionItem>
         )}
-        {hadithContent.length > 0 && (
+        {content.hadith.length > 0 && (
           <AccordionItem value="hadith" className="border-b-0">
             <AccordionTrigger className="hover:no-underline py-2 px-3 rounded-lg hover:bg-[var(--text-bg-hover)]">
               <div className="flex items-center gap-2 text-[var(--primary-color)]">
@@ -204,12 +207,12 @@ const RelatedContent = ({ content, isLoading }) => {
             </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-2 mt-2">
-                {hadithContent.map((item, index) => (
+                {content.hadith.map((item, index) => (
                   <ContentCard
                     key={index}
                     item={item}
                     type="Hadith"
-                    allContent={content}
+                    allContent={[...content.quran, ...content.hadith]}
                     currentIndex={selectedIndex}
                     onNavigate={handleNavigate}
                   />
