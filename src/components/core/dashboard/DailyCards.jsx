@@ -40,6 +40,7 @@ const TextSection = ({ text, translation, className = "" }) => {
     <div className={`space-y-4 ${className}`}>
       <p className="text-right arabic-text text-[1.4rem] leading-loose text-[var(--primary-color)]">
         {text}
+        {/* <span className="text-[0.9rem]">۝</span> */}
       </p>
       <p className="text-gray-600 text-sm">{translation}</p>
       <button
