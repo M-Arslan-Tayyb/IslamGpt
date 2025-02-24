@@ -159,7 +159,7 @@ const RelatedContent = ({ content, isLoading }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   if (isLoading) {
-    return <LoadingSkeleton />;
+    // return <LoadingSkeleton />;
   }
 
   if (!content || (content.quran.length === 0 && content.hadith.length === 0)) {
