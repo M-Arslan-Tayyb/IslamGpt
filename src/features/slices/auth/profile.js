@@ -4,12 +4,12 @@ import CryptoJS from "crypto-js";
 
 const USER_KEY = localStorage_values.USER_KEY;
 const SECRET_KEY = import.meta.env.VITE_LOCALSTORAGE_SECRET_KEY;
+
 const decrypt = (cipherText) => {
-  if (!cipherText) return null; // Avoid errors on empty values
+  if (!cipherText) return null;
   try {
     const bytes = CryptoJS.AES.decrypt(cipherText, SECRET_KEY);
     const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
-
     return decryptedText ? JSON.parse(decryptedText) : null;
   } catch (error) {
     console.error("Decryption failed:", error);
@@ -29,6 +29,12 @@ const profileSlice = createSlice({
   reducers: {
     setUser(state, action) {
       state.user = action.payload;
+      // Also update localStorage when setting user
+      const encryptedUser = CryptoJS.AES.encrypt(
+        JSON.stringify(action.payload),
+        SECRET_KEY
+      ).toString();
+      localStorage.setItem(USER_KEY, encryptedUser);
     },
     clearUser(state) {
       state.user = null;

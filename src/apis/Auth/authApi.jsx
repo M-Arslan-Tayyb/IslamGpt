@@ -38,11 +38,7 @@ export function useLoginMutation() {
     },
     onSuccess: (response) => {
       toast.dismiss();
-      // if (!response.data.success) {
-      //     throw new Error(response.data.message);
-      // }
-      // console.log(response)
-      // Encrypt function
+
       const encrypt = (data) => {
         return CryptoJS.AES.encrypt(
           JSON.stringify(data),
@@ -59,9 +55,10 @@ export function useLoginMutation() {
       toast.success(response.message);
       const firstName = response.data.data.First_Name;
       const lastName = response.data.data.Last_Name;
+      const user_id = response.data.data.user_id;
 
       // Dispatch user details to Redux store
-      dispatch(setUser({ firstName, lastName }));
+      dispatch(setUser({ firstName, lastName, user_id }));
 
       // Set token in localStorage and Redux store
       // console.log("the token value is:", response.data.data.access_token);
@@ -70,7 +67,7 @@ export function useLoginMutation() {
       dispatch(setToken(response.data.data.access_token));
 
       // Set user in localStorage
-      const encryptedUser = encrypt({ firstName, lastName });
+      const encryptedUser = encrypt({ firstName, lastName, user_id });
       localStorage.setItem(USER_KEY, encryptedUser);
 
       // Set user in Redux store

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronRight, Book, MessageCircle, X, Maximize2 } from "lucide-react";
 import {
   Dialog,
@@ -29,6 +29,11 @@ const MetadataBadge = ({ children }) => (
 const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [currentItem, setCurrentItem] = useState(item);
+
+  useEffect(() => {
+    setCurrentItem(allContent[currentIndex]);
+  }, [currentIndex, allContent]);
 
   const truncateText = (text, maxLength = 89) => {
     if (text.length <= maxLength) return text;
@@ -38,6 +43,11 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
   const dialogClass = isFullscreen
     ? "w-screen h-screen max-w-none !rounded-none"
     : "max-w-[90vw] w-full h-[80vh]";
+
+  const handleItemClick = (idx) => {
+    onNavigate(idx);
+    setCurrentItem(allContent[idx]);
+  };
 
   return (
     <>
@@ -51,13 +61,13 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className={dialogClass}>
+        <DialogContent className={`${dialogClass} [&>button]:hidden`}>
           <DialogHeader className="border-b pb-4">
             <div className="flex items-center justify-between mb-4">
               <DialogTitle className="text-xl">
-                {type === "Hadith"
+                {currentItem.type === "Hadith"
                   ? "Riyadussalihin"
-                  : `Surah ${item.surah_name}`}
+                  : `Surah ${currentItem.surah_name}`}
               </DialogTitle>
               <div className="flex items-center gap-2">
                 <Button
@@ -76,20 +86,22 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              {type === "Hadith" ? (
+              {currentItem.type === "Hadith" ? (
                 <>
                   <MetadataBadge>
-                    Chapter: {item.hadith_chapter_english}
+                    Chapter: {currentItem.hadith_chapter_english}
                   </MetadataBadge>
-                  <MetadataBadge>Book: {item.hadith_book_name}</MetadataBadge>
                   <MetadataBadge>
-                    Reference: {item.hadith_reference}
+                    Book: {currentItem.hadith_book_name}
+                  </MetadataBadge>
+                  <MetadataBadge>
+                    Reference: {currentItem.hadith_reference}
                   </MetadataBadge>
                 </>
               ) : (
                 <>
-                  <MetadataBadge>Surah: {item.surah_name}</MetadataBadge>
-                  <MetadataBadge>Verse: {item.ayah_no}</MetadataBadge>
+                  <MetadataBadge>Surah: {currentItem.surah_name}</MetadataBadge>
+                  <MetadataBadge>Verse: {currentItem.ayah_no}</MetadataBadge>
                 </>
               )}
             </div>
@@ -101,7 +113,9 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
               <div className="space-y-6">
                 <div className="rounded-lg">
                   <p className="text-2xl text-[var(--primary-color)] font-semibold text-right font-amiri leading-loose">
-                    {type === "Quran" ? item.ayah : item.hadith_arabic}
+                    {currentItem.type === "Quran"
+                      ? currentItem.ayah
+                      : currentItem.hadith_arabic}
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -109,16 +123,16 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
                     English Translation
                   </h4>
                   <p className="text-gray-600 leading-relaxed">
-                    {item.description}
+                    {currentItem.description}
                   </p>
                 </div>
-                {type === "Quran" && (
+                {currentItem.type === "Quran" && (
                   <div className="space-y-2">
                     <h4 className="font-medium text-gray-900">
                       Arabic Translation
                     </h4>
                     <p className="text-gray-600 leading-relaxed">
-                      {item.arabic_trans}
+                      {currentItem.arabic_trans}
                     </p>
                   </div>
                 )}
@@ -127,16 +141,20 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
 
             {/* Related Content Sidebar */}
             <div className="lg:col-span-1 overflow-y-auto p-4 bg-gray-50">
-              <h3 className="font-medium text-gray-900 mb-4">More {type}s</h3>
+              <h3 className="font-medium text-gray-900 mb-4">
+                More {currentItem.type}s
+              </h3>
               <div className="space-y-3">
                 {allContent
-                  .filter((content) => content.type === type)
+                  .filter((content) => content.type === currentItem.type)
                   .map((content, idx) => (
                     <div
                       key={idx}
-                      onClick={() => onNavigate(idx)}
+                      onClick={() =>
+                        handleItemClick(allContent.indexOf(content))
+                      }
                       className={`p-3 rounded-lg cursor-pointer transition-all ${
-                        idx === currentIndex
+                        content === currentItem
                           ? "bg-[var(--primary-color)] text-white"
                           : "bg-white hover:bg-[var(--text-bg)]"
                       }`}
@@ -154,7 +172,6 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
     </>
   );
 };
-
 const RelatedContent = ({ content, isLoading }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -172,56 +189,61 @@ const RelatedContent = ({ content, isLoading }) => {
 
   return (
     <div className="bg-[var(--text-bg)] rounded-lg">
-      <Accordion type="single" collapsible className="px-4 py-2">
-        {content.quran.length > 0 && (
-          <AccordionItem value="quran" className="border-b-0">
-            <AccordionTrigger className="hover:no-underline py-2 px-3 rounded-lg hover:bg-[var(--text-bg-hover)]">
-              <div className="flex items-center gap-2 text-[var(--primary-color)]">
-                <Book className="h-4 w-4" />
-                <span className="font-medium">Related Quran</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 mt-2">
-                {content.quran.map((item, index) => (
-                  <ContentCard
-                    key={index}
-                    item={item}
-                    type="Quran"
-                    allContent={[...content.quran, ...content.hadith]}
-                    currentIndex={selectedIndex}
-                    onNavigate={handleNavigate}
-                  />
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        )}
-        {content.hadith.length > 0 && (
-          <AccordionItem value="hadith" className="border-b-0">
-            <AccordionTrigger className="hover:no-underline py-2 px-3 rounded-lg hover:bg-[var(--text-bg-hover)]">
-              <div className="flex items-center gap-2 text-[var(--primary-color)]">
-                <MessageCircle className="h-4 w-4" />
-                <span className="font-medium">Related Hadiths</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 mt-2">
-                {content.hadith.map((item, index) => (
-                  <ContentCard
-                    key={index}
-                    item={item}
-                    type="Hadith"
-                    allContent={[...content.quran, ...content.hadith]}
-                    currentIndex={selectedIndex}
-                    onNavigate={handleNavigate}
-                  />
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        )}
-      </Accordion>
+      <div className=" rounded-lg">
+        <Accordion type="single" collapsible className="px-4 py-2">
+          {/* Quran Section */}
+          {content.quran.length > 0 && (
+            <AccordionItem value="quran" className="border-b-0">
+              <AccordionTrigger className="hover:bg-[var(--text-bg-hover)] px-3 py-2 rounded-lg transition">
+                <div className="flex items-center gap-2 text-[var(--primary-color)]">
+                  <Book className="h-4 w-4" />
+                  <span className="font-medium">Related Quran</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-2 mt-2">
+                  {content.quran.map((item, index) => (
+                    <ContentCard
+                      key={index}
+                      item={item}
+                      type="Quran"
+                      allContent={[...content.quran, ...content.hadith]}
+                      currentIndex={selectedIndex}
+                      onNavigate={handleNavigate}
+                    />
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+
+          {/* Hadith Section */}
+          {content.hadith.length > 0 && (
+            <AccordionItem value="hadith" className="border-b-0">
+              <AccordionTrigger className="hover:bg-[var(--text-bg-hover)] px-3 py-2 rounded-lg transition">
+                <div className="flex items-center gap-2 text-[var(--primary-color)]">
+                  <MessageCircle className="h-4 w-4" />
+                  <span className="font-medium">Related Hadiths</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-2 mt-2">
+                  {content.hadith.map((item, index) => (
+                    <ContentCard
+                      key={index}
+                      item={item}
+                      type="Hadith"
+                      allContent={[...content.quran, ...content.hadith]}
+                      currentIndex={selectedIndex}
+                      onNavigate={handleNavigate}
+                    />
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+        </Accordion>
+      </div>
     </div>
   );
 };

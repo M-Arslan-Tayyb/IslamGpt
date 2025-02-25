@@ -1,16 +1,20 @@
 import { useMutation } from "@tanstack/react-query";
-import toast from "react-hot-toast"; // Note: it's a default import for react-hot-toast
+import toast from "react-hot-toast";
 import { chat_endpoints } from "../apiEndPoints";
 import { apiConnector } from "../apiConnector";
+import { useSelector } from "react-redux";
 
 const { GENERATE_AI } = chat_endpoints;
 
+// console.log("userid in chatapi: ", user);
+
 export function useGenerateAIMutation() {
+  const { user } = useSelector((state) => state.profile);
   return useMutation({
     mutationFn: async (query) => {
       const payload = {
         query,
-        user_id: "1",
+        user_id: user?.user_id,
         session_id: crypto.randomUUID(),
       };
       const response = await apiConnector("POST", GENERATE_AI, payload);
@@ -19,7 +23,6 @@ export function useGenerateAIMutation() {
     onMutate: () => {
       console.log("Mutation started");
       toast.dismiss(); // Dismiss any existing toasts
-      // toast.loading("Generating response...");
     },
     onSuccess: (data) => {
       console.log("API Response:", data);
@@ -28,8 +31,6 @@ export function useGenerateAIMutation() {
       if (data.success === false) {
         throw new Error(data.message || "Failed to generate response");
       }
-
-      // toast.success("Response generated successfully");
       return data;
     },
     onError: (error) => {
