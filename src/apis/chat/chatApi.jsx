@@ -14,14 +14,14 @@ export function useGenerateAIMutation() {
     mutationFn: async (query) => {
       const payload = {
         query,
-        user_id: user?.user_id,
+        user_id: toString(user?.user_id),
         session_id: crypto.randomUUID(),
       };
       const response = await apiConnector("POST", GENERATE_AI, payload);
       return response.data;
     },
     onMutate: () => {
-      console.log("Mutation started");
+
       toast.dismiss(); // Dismiss any existing toasts
     },
     onSuccess: (data) => {

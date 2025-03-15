@@ -23,7 +23,7 @@ const ResourceList = ({ query, aiResponse, isLoading }) => {
       {aiResponse ? (
         <div className="mb-6">
           <div className="bg-white rounded-lg p-4">
-            <h3 className="font-medium text-gray-900 mb-2">AI Response</h3>
+            {/* <h3 className="font-medium text-gray-900 mb-2">AI Response</h3> */}
             <p className="text-gray-600">{aiResponse}</p>
           </div>
         </div>
