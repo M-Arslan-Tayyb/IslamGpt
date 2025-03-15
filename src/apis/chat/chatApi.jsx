@@ -14,7 +14,8 @@ export function useGenerateAIMutation() {
     mutationFn: async (query) => {
       const payload = {
         query,
-        user_id: toString(user?.user_id),
+        user_id: String(user?.user_id),
+
         session_id: crypto.randomUUID(),
       };
       const response = await apiConnector("POST", GENERATE_AI, payload);
