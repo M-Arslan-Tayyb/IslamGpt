@@ -15,12 +15,7 @@ const ChatWrapper = ({ children, relatedContent, isLoading }) => {
               {children}
             </div>
           </div>
-          {/* Fixed input at bottom */}
-          {/* <div className="absolute bottom-0 left-0 w-full lg:w-3/4 border-t border-gray-200 bg-white p-4"> */}
-          {/* <div className="max-w-3xl mx-auto"> */}
-          {/* Input field will be rendered here */}
-          {/* </div>
-          </div> */}
+
         </div>
 
         {/* Related content sidebar */}

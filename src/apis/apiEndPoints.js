@@ -16,6 +16,8 @@ export const dashboard_endpoints = {
 
 export const chat_endpoints = {
   GENERATE_AI: BASE_URL + "/generate",
+  GET_LISTING: BASE_URL + "/get-listing",
+  GET_HISTORY: BASE_URL + "/get-history",
 };
 
 export const localStorage_values = {
