@@ -50,7 +50,7 @@ const Header = () => {
           {isChat && (
             <Button
               variant="ghost"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate("/dashboard")}
               className="hover:bg-gray-100"
             >
               <ArrowLeft className="h-5 w-5" />

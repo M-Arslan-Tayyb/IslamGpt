@@ -16,6 +16,10 @@ import ResetPassword from "./pages/ResetPassword";
 import PrivateRoute from "./components/core/Auth/PrivateRoute";
 import OpenRoute from "./components/core/Auth/OpenRoute";
 import DashboardRoute from "./components/core/Auth/DashboardRoute";
+import LearnIslam from "./pages/LearnIslam";
+import Events from "./pages/Events";
+import PrayerTime from "./pages/PrayerTime";
+import NearByMosque from "./pages/NearByMosque";
 
 function App() {
   const router = createBrowserRouter([
@@ -40,7 +44,7 @@ function App() {
           path: "/learn-islam",
           element: (
             <PrivateRoute>
-              <ErrorBoundary>{/* <LearnIslam /> */}</ErrorBoundary>
+              <ErrorBoundary><LearnIslam /></ErrorBoundary>
             </PrivateRoute>
           ),
         },
@@ -48,7 +52,7 @@ function App() {
           path: "/events",
           element: (
             <PrivateRoute>
-              <ErrorBoundary>{/* <Events /> */}</ErrorBoundary>
+              <ErrorBoundary><Events /></ErrorBoundary>
             </PrivateRoute>
           ),
         },
@@ -56,7 +60,7 @@ function App() {
           path: "/prayer-time",
           element: (
             <PrivateRoute>
-              <ErrorBoundary>{/* <PrayerTime /> */}</ErrorBoundary>
+              <ErrorBoundary><PrayerTime /></ErrorBoundary>
             </PrivateRoute>
           ),
         },
@@ -85,7 +89,7 @@ function App() {
       path: "/nearby-places",
       element: (
         <PrivateRoute>
-          <ErrorBoundary>{/* <NearbyPlaces /> */}</ErrorBoundary>
+          <ErrorBoundary><NearByMosque /></ErrorBoundary>
         </PrivateRoute>
       ),
     },

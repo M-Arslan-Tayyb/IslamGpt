@@ -183,8 +183,8 @@ const ContentCard = ({ item, allContent, currentItem, onNavigate }) => {
                         onNavigate(content);
                       }}
                       className={`p-3 rounded-lg cursor-pointer transition-all ${getContentId(content) === getContentId(dialogItem)
-                          ? "bg-[var(--primary-color)] text-white"
-                          : "bg-white hover:bg-[var(--text-bg)]"
+                        ? "bg-[var(--primary-color)] text-white"
+                        : "bg-white hover:bg-[var(--text-bg)]"
                         }`}
                     >
                       <p className="text-sm">
@@ -203,17 +203,18 @@ const ContentCard = ({ item, allContent, currentItem, onNavigate }) => {
 
 const RelatedContent = ({ content, isLoading }) => {
   const [currentItem, setCurrentItem] = useState(null);
+  // Set activeAccordion to null by default to keep all accordions closed
   const [activeAccordion, setActiveAccordion] = useState(null);
 
   useEffect(() => {
-    // Set initial content and accordion value when content changes
+    // Initialize currentItem but don't open any accordion by default
     if (content) {
       if (content.quran && content.quran.length > 0) {
         setCurrentItem(content.quran[0]);
-        setActiveAccordion("quran");
+        // Removed the line that sets activeAccordion to "quran"
       } else if (content.hadith && content.hadith.length > 0) {
         setCurrentItem(content.hadith[0]);
-        setActiveAccordion("hadith");
+        // Removed the line that sets activeAccordion to "hadith"
       }
     }
   }, [content]);

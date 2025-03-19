@@ -91,14 +91,10 @@ const Chat = () => {
         sessionIdRef.current = chatId
         fetchSessionHistory(chatId)
       }
-      // If no chatId but sessions exist, select the first one
-      else if (formattedSessions.length > 0 && !sessionIdRef.current) {
-        const firstSessionId = formattedSessions[0].id
-        console.log("Setting active session to first session:", firstSessionId)
-        setActiveSessionId(firstSessionId)
-        sessionIdRef.current = firstSessionId
-        navigate(`/chat?chatId=${firstSessionId}`, { replace: true })
-        fetchSessionHistory(firstSessionId)
+      // If no chatId and we're navigating to the chat page directly, create a new chat
+      else if (!sessionIdRef.current || location.pathname === "/chat") {
+        // Create a new chat instead of selecting the first session
+        handleNewChat()
       }
     } else if (listingData) {
       console.log("Listing data format unexpected:", listingData)
@@ -191,14 +187,15 @@ const Chat = () => {
     sessionIdRef.current = newSessionId;
 
     // Clear the current chat
-    navigate("/chat");
     setChatHistory([]);
     setCurrentQuery(null);
+
+    // Update the URL without triggering a full navigation
+    navigate(`/chat?chatId=${newSessionId}`, { replace: true });
 
     // Open sidebar when creating a new chat
     setIsSidebarCollapsed(false);
   }
-
   // Handle session selection
   const handleSelectSession = (sessionId) => {
     if (sessionId === sessionIdRef.current) return

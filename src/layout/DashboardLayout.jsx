@@ -19,24 +19,21 @@ const DashboardLayout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-gray)]">
+    <div className="min-h-screen flex flex-col bg-[var(--bg-gray)]">
       <Header />
-      <div className=" flex">
+      <div className="flex flex-1">
         {showSidebar && (
           <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
         )}
         <main
-          className={`flex-1 transition-all duration-300 ${
-            showSidebar ? (isSidebarOpen ? "md:ml-52" : "md:ml-16") : ""
-          } pb-16 md:pb-0`}
+          className={`flex-1 transition-all duration-300 ${showSidebar ? (isSidebarOpen ? "md:ml-52" : "md:ml-16") : ""
+            } pb-16 md:pb-0`}
         >
           <div className="container mx-auto px-4 py-8">
             <Outlet />
           </div>
         </main>
       </div>
-      {/* Footer space for mobile */}
-      <div className="h-16 md:hidden" />
       <Footer />
     </div>
   );
