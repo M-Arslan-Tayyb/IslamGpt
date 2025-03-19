@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import Typical from "react-typical";
+import { Typewriter } from "react-simple-typewriter";
 
 const ComingSoon = () => {
     return (
@@ -12,11 +12,16 @@ const ComingSoon = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, ease: "easeOut" }}
             >
-                <Typical
-                    steps={["Coming Soon...", 2000]}
-                    loop={1}
-                    wrapper="span"
-                />
+                <span>
+                    <Typewriter
+                        words={["Coming Soon..."]}
+                        loop={1}
+                        cursor
+                        typeSpeed={80}
+                        deleteSpeed={50}
+                        delaySpeed={2000}
+                    />
+                </span>
             </motion.div>
 
             {/* Underline animation (Signature Effect) */}
