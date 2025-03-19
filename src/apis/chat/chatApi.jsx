@@ -24,8 +24,8 @@ export function useGenerateAIMutation() {
       const payload = {
         query,
         user_id: String(user.user_id),
-        // session_id: actualSessionId,
-        session_id: "77777777",
+        session_id: actualSessionId,
+        // session_id: "77777777",
 
       }
 
@@ -50,12 +50,12 @@ export function useGenerateAIMutation() {
     },
     onMutate: () => {
       // Show a loading toast that can be dismissed later
-      toast.loading("Generating response...", { id: "ai-response" })
+      // toast.loading("Generating response...", { id: "ai-response" })
     },
     onSuccess: (data) => {
       console.log("AI Response successful:", data)
       // Dismiss the loading toast and show success
-      toast.success("Response generated successfully", { id: "ai-response" })
+      // toast.success("Response generated successfully", { id: "ai-response" })
     },
     onError: (error) => {
       console.error("GENERATE AI ERROR:", error)

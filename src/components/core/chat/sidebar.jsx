@@ -15,6 +15,7 @@ const ChatSidebar = ({
     isLoading = false,
 }) => {
     // Format chat title to be more readable
+    console.log("sessions", sessions)
     const formatChatTitle = (query) => {
         return query.length > 30 ? query.substring(0, 30) + "..." : query
     }
@@ -44,7 +45,7 @@ const ChatSidebar = ({
             </div>
         )
     }
-
+    console.log(activeSessionId, "::", sessions.id)
     return (
         <div className="h-full flex flex-col bg-white border-r border-gray-200 w-full relative">
             {/* Header */}
@@ -75,21 +76,28 @@ const ChatSidebar = ({
                                 </div>
                             ))
                     ) : sessions.length > 0 ? (
-                        sessions.map((session) => (
-                            <Button
-                                key={session.id}
-                                variant="ghost"
-                                className={cn(
-                                    "w-full justify-start text-left font-normal",
-                                    session.id === activeSessionId ? "bg-gray-100 text-[var(--primary-color)]" : "hover:bg-gray-100",
-                                )}
-                                onClick={() => onSelectSession(session.id)}
-                            >
-                                <div className="flex-1 truncate">
-                                    <span className="block truncate">{formatChatTitle(session.title || "New Conversation")}</span>
-                                </div>
-                            </Button>
-                        ))
+                        sessions.map((session) => {
+                            const isActive = session.id === activeSessionId;
+                            return (
+                                <Button
+                                    key={session.id}
+                                    variant={isActive ? "secondary" : "ghost"}
+                                    className={cn(
+                                        "w-full justify-start text-left font-normal",
+                                        isActive
+                                            ? "bg-gray-100 text-[var(--primary-color)] hover:bg-gray-200"
+                                            : "hover:bg-gray-100"
+                                    )}
+                                    onClick={() => onSelectSession(session.id)}
+                                >
+                                    <div className="flex-1 truncate">
+                                        <span className="block truncate">
+                                            {formatChatTitle(session.title || "New Conversation")}
+                                        </span>
+                                    </div>
+                                </Button>
+                            );
+                        })
                     ) : (
                         <div className="text-center py-4 text-gray-500 text-sm">No conversations yet</div>
                     )}

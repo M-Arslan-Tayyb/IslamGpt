@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronRight, Book, MessageCircle, X, Maximize2 } from "lucide-react";
+import { ChevronRight, Book, MessageCircle, X, Maximize2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -26,16 +26,42 @@ const MetadataBadge = ({ children }) => (
   </Badge>
 );
 
-const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
+// Helper function to get a unique identifier for each content item
+const getContentId = (item) => {
+  if (!item) return "";
+  if (item.type === "Hadith") {
+    return `hadith-${item.hadith_reference || ""}-${item.hadith_book_name || ""}`;
+  } else {
+    return `quran-${item.surah_name || ""}-${item.ayah_no || ""}`;
+  }
+};
+
+const ContentCard = ({ item, allContent, currentItem, onNavigate }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [currentItem, setCurrentItem] = useState(item);
+  const [dialogItem, setDialogItem] = useState(item);
 
   useEffect(() => {
-    setCurrentItem(allContent[currentIndex]);
-  }, [currentIndex, allContent]);
+    if (isModalOpen) {
+      setDialogItem(item);
+    }
+  }, [isModalOpen, item]);
+
+  // Get the appropriate text content based on content type
+  const getContentText = (item) => {
+    if (!item) return "";
+
+    // For Hadith items, use hadith_english if description is undefined
+    if (item.type === "Hadith") {
+      return item.description || item.hadith_english || "";
+    }
+
+    // For other items, use description
+    return item.description || "";
+  };
 
   const truncateText = (text, maxLength = 89) => {
+    if (!text) return "";
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength) + "...";
   };
@@ -44,19 +70,20 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
     ? "w-screen h-screen max-w-none !rounded-none"
     : "max-w-[90vw] w-full h-[80vh]";
 
-  const handleItemClick = (idx) => {
-    onNavigate(idx);
-    setCurrentItem(allContent[idx]);
-  };
+  const isSelected = getContentId(item) === getContentId(currentItem);
 
   return (
     <>
       <div
-        onClick={() => setIsModalOpen(true)}
-        className="bg-white hover:bg-[var(--text-bg)] rounded-lg p-3 cursor-pointer transition-all border border-gray-200 hover:border-[var(--primary-color)] hover:shadow-sm"
+        onClick={() => {
+          setIsModalOpen(true);
+          onNavigate(item);
+        }}
+        className={`bg-white hover:bg-[var(--text-bg)] rounded-lg p-3 cursor-pointer transition-all border border-gray-200 hover:border-[var(--primary-color)] hover:shadow-sm ${isSelected ? "border-[var(--primary-color)] bg-[var(--text-bg)]" : ""
+          }`}
       >
         <p className="text-sm text-gray-600">
-          {truncateText(item.description)}
+          {truncateText(getContentText(item))}
         </p>
       </div>
 
@@ -65,9 +92,9 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
           <DialogHeader className="border-b pb-4">
             <div className="flex items-center justify-between mb-4">
               <DialogTitle className="text-xl">
-                {currentItem.type === "Hadith"
-                  ? "Riyadussalihin"
-                  : `Surah ${currentItem.surah_name}`}
+                {dialogItem.type === "Hadith"
+                  ? `${dialogItem.hadith_book_name || "Hadith"}`
+                  : `Surah ${dialogItem.surah_name || ""}`}
               </DialogTitle>
               <div className="flex items-center gap-2">
                 <Button
@@ -86,22 +113,22 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              {currentItem.type === "Hadith" ? (
+              {dialogItem.type === "Hadith" ? (
                 <>
                   <MetadataBadge>
-                    Chapter: {currentItem.hadith_chapter_english}
+                    Chapter: {dialogItem.hadith_chapter_english || "N/A"}
                   </MetadataBadge>
                   <MetadataBadge>
-                    Book: {currentItem.hadith_book_name}
+                    Book: {dialogItem.hadith_book_name || "N/A"}
                   </MetadataBadge>
                   <MetadataBadge>
-                    Reference: {currentItem.hadith_reference}
+                    Reference: {dialogItem.hadith_reference || "N/A"}
                   </MetadataBadge>
                 </>
               ) : (
                 <>
-                  <MetadataBadge>Surah: {currentItem.surah_name}</MetadataBadge>
-                  <MetadataBadge>Verse: {currentItem.ayah_no}</MetadataBadge>
+                  <MetadataBadge>Surah: {dialogItem.surah_name || "N/A"}</MetadataBadge>
+                  <MetadataBadge>Verse: {dialogItem.ayah_no || "N/A"}</MetadataBadge>
                 </>
               )}
             </div>
@@ -113,9 +140,9 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
               <div className="space-y-6">
                 <div className="rounded-lg">
                   <p className="text-2xl text-[var(--primary-color)] font-semibold text-right font-amiri leading-loose">
-                    {currentItem.type === "Quran"
-                      ? currentItem.ayah
-                      : currentItem.hadith_arabic}
+                    {dialogItem.type === "Quran"
+                      ? dialogItem.ayah || ""
+                      : dialogItem.hadith_arabic || ""}
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -123,16 +150,16 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
                     English Translation
                   </h4>
                   <p className="text-gray-600 leading-relaxed">
-                    {currentItem.description}
+                    {getContentText(dialogItem)}
                   </p>
                 </div>
-                {currentItem.type === "Quran" && (
+                {dialogItem.type === "Quran" && (
                   <div className="space-y-2">
                     <h4 className="font-medium text-gray-900">
                       Arabic Translation
                     </h4>
                     <p className="text-gray-600 leading-relaxed">
-                      {currentItem.arabic_trans}
+                      {dialogItem.arabic_trans || "No translation available"}
                     </p>
                   </div>
                 )}
@@ -142,25 +169,26 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
             {/* Related Content Sidebar */}
             <div className="lg:col-span-1 overflow-y-auto p-4 bg-gray-50">
               <h3 className="font-medium text-gray-900 mb-4">
-                More {currentItem.type}s
+                More {dialogItem.type}s
               </h3>
               <div className="space-y-3">
                 {allContent
-                  .filter((content) => content.type === currentItem.type)
+                  .filter((content) => content && content.type === dialogItem.type)
                   .map((content, idx) => (
                     <div
                       key={idx}
-                      onClick={() =>
-                        handleItemClick(allContent.indexOf(content))
-                      }
-                      className={`p-3 rounded-lg cursor-pointer transition-all ${
-                        content === currentItem
+                      onClick={() => {
+                        console.log("Sidebar item clicked:", getContentId(content));
+                        setDialogItem(content);
+                        onNavigate(content);
+                      }}
+                      className={`p-3 rounded-lg cursor-pointer transition-all ${getContentId(content) === getContentId(dialogItem)
                           ? "bg-[var(--primary-color)] text-white"
                           : "bg-white hover:bg-[var(--text-bg)]"
-                      }`}
+                        }`}
                     >
                       <p className="text-sm">
-                        {truncateText(content.description, 60)}
+                        {truncateText(getContentText(content), 60)}
                       </p>
                     </div>
                   ))}
@@ -172,27 +200,68 @@ const ContentCard = ({ item, type, allContent, currentIndex, onNavigate }) => {
     </>
   );
 };
+
 const RelatedContent = ({ content, isLoading }) => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [currentItem, setCurrentItem] = useState(null);
+  const [activeAccordion, setActiveAccordion] = useState(null);
+
+  useEffect(() => {
+    // Set initial content and accordion value when content changes
+    if (content) {
+      if (content.quran && content.quran.length > 0) {
+        setCurrentItem(content.quran[0]);
+        setActiveAccordion("quran");
+      } else if (content.hadith && content.hadith.length > 0) {
+        setCurrentItem(content.hadith[0]);
+        setActiveAccordion("hadith");
+      }
+    }
+  }, [content]);
 
   if (isLoading) {
     // return <LoadingSkeleton />;
   }
 
-  if (!content || (content.quran.length === 0 && content.hadith.length === 0)) {
+  // Add additional checks to prevent errors
+  if (!content || !content.quran || !content.hadith ||
+    (content.quran.length === 0 && content.hadith.length === 0)) {
     return null;
   }
 
-  const handleNavigate = (newIndex) => {
-    setSelectedIndex(newIndex);
+  // Make sure we have valid arrays
+  const quranContent = Array.isArray(content.quran) ? content.quran : [];
+  const hadithContent = Array.isArray(content.hadith) ? content.hadith : [];
+
+  // Combine all content
+  const allContent = [...quranContent, ...hadithContent];
+
+  const handleNavigate = (item) => {
+    console.log("RelatedContent handleNavigate - Item:", getContentId(item));
+    setCurrentItem(item);
+    setActiveAccordion(item.type === "Quran" ? "quran" : "hadith");
   };
 
   return (
     <div className="bg-[var(--text-bg)] rounded-lg">
-      <div className=" rounded-lg">
-        <Accordion type="single" collapsible className="px-4 py-2">
+      <div className="rounded-lg">
+        <Accordion
+          type="single"
+          collapsible
+          className="px-4 py-2"
+          value={activeAccordion}
+          onValueChange={(value) => {
+            console.log("Accordion onValueChange - Value:", value);
+            setActiveAccordion(value);
+
+            if (value === "quran" && quranContent.length > 0) {
+              setCurrentItem(quranContent[0]);
+            } else if (value === "hadith" && hadithContent.length > 0) {
+              setCurrentItem(hadithContent[0]);
+            }
+          }}
+        >
           {/* Quran Section */}
-          {content.quran.length > 0 && (
+          {quranContent.length > 0 && (
             <AccordionItem value="quran" className="border-b-0">
               <AccordionTrigger className="hover:bg-[var(--text-bg-hover)] px-3 py-2 rounded-lg transition">
                 <div className="flex items-center gap-2 text-[var(--primary-color)]">
@@ -202,13 +271,12 @@ const RelatedContent = ({ content, isLoading }) => {
               </AccordionTrigger>
               <AccordionContent>
                 <div className="space-y-2 mt-2">
-                  {content.quran.map((item, index) => (
+                  {quranContent.map((item, index) => (
                     <ContentCard
                       key={index}
                       item={item}
-                      type="Quran"
-                      allContent={[...content.quran, ...content.hadith]}
-                      currentIndex={selectedIndex}
+                      allContent={allContent}
+                      currentItem={currentItem}
                       onNavigate={handleNavigate}
                     />
                   ))}
@@ -218,7 +286,7 @@ const RelatedContent = ({ content, isLoading }) => {
           )}
 
           {/* Hadith Section */}
-          {content.hadith.length > 0 && (
+          {hadithContent.length > 0 && (
             <AccordionItem value="hadith" className="border-b-0">
               <AccordionTrigger className="hover:bg-[var(--text-bg-hover)] px-3 py-2 rounded-lg transition">
                 <div className="flex items-center gap-2 text-[var(--primary-color)]">
@@ -228,13 +296,12 @@ const RelatedContent = ({ content, isLoading }) => {
               </AccordionTrigger>
               <AccordionContent>
                 <div className="space-y-2 mt-2">
-                  {content.hadith.map((item, index) => (
+                  {hadithContent.map((item, index) => (
                     <ContentCard
                       key={index}
                       item={item}
-                      type="Hadith"
-                      allContent={[...content.quran, ...content.hadith]}
-                      currentIndex={selectedIndex}
+                      allContent={allContent}
+                      currentItem={currentItem}
                       onNavigate={handleNavigate}
                     />
                   ))}
