@@ -1,10 +1,11 @@
-import React from "react";
-import Header from "../components/common/Header";
-import Footer from "../components/common/Footer";
+"use client";
+
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import ChatInterface from "../components/common/ChatInterface";
 import DailyCards from "../components/core/dashboard/DailyCards";
 import { useDailyContent } from "../apis/dashboard/dashbaordApi";
-import { useNavigate } from "react-router-dom";
+import LocationRequestModal from "../components/common/LocationRequestModal";
 
 const Dashboard = () => {
   const { data: dailyContent, isLoading, isError } = useDailyContent();
@@ -13,6 +14,42 @@ const Dashboard = () => {
   const handleAskQuestion = (query) => {
     // Navigate to the chat page with the query
     navigate("/chat", { state: { query } });
+  };
+
+  const {
+    hasValidLocation,
+    locationStatus,
+    isLocationModalOpen,
+    requestLocation,
+    showLocationModal,
+    hideLocationModal,
+  } = useLocationService();
+
+  useEffect(() => {
+    // Show location request modal when user first visits dashboard
+    const hasShownLocationRequest = localStorage.getItem(
+      "hasShownLocationRequest"
+    );
+
+    if (
+      !hasValidLocation &&
+      !hasShownLocationRequest &&
+      locationStatus === "unknown"
+    ) {
+      // Small delay to ensure page is loaded
+      setTimeout(() => {
+        showLocationModal(false);
+        localStorage.setItem("hasShownLocationRequest", "true");
+      }, 1000);
+    }
+  }, [hasValidLocation, locationStatus, showLocationModal]);
+
+  const handleLocationConfirm = async () => {
+    try {
+      await requestLocation();
+    } catch (error) {
+      console.error("Location request failed:", error);
+    }
   };
 
   return (
@@ -43,6 +80,12 @@ const Dashboard = () => {
           )}
         </div>
       </main>
+      <LocationRequestModal
+        isOpen={isLocationModalOpen}
+        onClose={hideLocationModal}
+        onConfirm={handleLocationConfirm}
+        isRequired={false}
+      />
     </div>
   );
 };

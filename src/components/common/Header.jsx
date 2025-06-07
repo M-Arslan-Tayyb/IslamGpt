@@ -78,13 +78,6 @@ const Header = () => {
                   {hijriDateStr}
                 </p>
               </div>
-              <Button
-                variant="ghost"
-                className="flex items-center text-xs bg-[var(--text-bg)] hover:bg-[var(--text-bg-hover)] transition-all duration-300"
-              >
-                <MapPin className="h-4 w-4 mr-2" />
-                Select Location
-              </Button>
             </div>
           )}
         </div>

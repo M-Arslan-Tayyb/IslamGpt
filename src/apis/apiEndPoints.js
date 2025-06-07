@@ -20,7 +20,12 @@ export const chat_endpoints = {
   GET_HISTORY: BASE_URL + "/get-history",
 };
 
+export const NEARBY_MOSQUES_endpoints = {
+  NEARBY_MOSQUES_API: BASE_URL + "/nearby-mosques",
+};
+
 export const localStorage_values = {
   TOKEN_KEY: "islamgpt_token",
   USER_KEY: "islamgpt_user",
+  LOCATION_KEY: "userLocation",
 };
