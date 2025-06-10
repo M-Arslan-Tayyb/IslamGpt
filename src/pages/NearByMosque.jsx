@@ -5,6 +5,7 @@ import { MapPin, Loader2, RefreshCw } from "lucide-react";
 import { useNearbyMosquesMutation } from "@/apis/NearByMosque/mosque";
 import LocationRequestModal from "@/components/common/LocationRequestModal";
 import MosqueCard from "@/components/core/NearByMosque/MosqueCard";
+import nearbyImage from "../assets/images/general/nearby-background.webp";
 
 const NearByMosque = () => {
   const [userLocation, setUserLocation] = useState({
@@ -198,9 +199,19 @@ const NearByMosque = () => {
   return (
     <div className="min-h-screen bg-[var(--bg-light)] pb-10">
       {/* Hero Section */}
-      <div className="relative h-64 bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-color)] overflow-hidden">
-        <div className="absolute inset-0 opacity-20 bg-[url('/images/mosque-pattern.png')] bg-repeat"></div>
-        <div className="container mx-auto px-4 h-full flex flex-col justify-center items-center text-white relative z-10">
+      <div className="relative h-64 w-full overflow-hidden">
+        {/* Image as a visible element, not CSS background */}
+        <img
+          src={nearbyImage}
+          alt="Nearby Mosques Background"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+
+        {/* Optional pattern overlay */}
+        <div className="absolute inset-0 bg-[url('/images/mosque-pattern.png')] bg-repeat opacity-20"></div>
+
+        {/* Text/content on top of the image */}
+        <div className="relative z-10 flex flex-col items-center justify-center h-full text-white container mx-auto px-4">
           <h1 className="text-3xl md:text-4xl font-bold text-center">
             Nearby Mosques
           </h1>

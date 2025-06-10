@@ -45,8 +45,6 @@ const LocationRequestModal = ({
             <ul className="text-sm text-[var(--text-gray)] space-y-1">
               <li>• Find nearby mosques for prayer</li>
               <li>• Show accurate prayer times</li>
-              <li>• Provide location-based Islamic services</li>
-              <li>• Calculate Qibla direction</li>
             </ul>
           </div>
 
