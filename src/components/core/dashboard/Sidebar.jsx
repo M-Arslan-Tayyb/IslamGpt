@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -11,7 +13,13 @@ import {
   Brain,
   Menu,
   CircleX,
+  MoreHorizontal,
 } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 // Mobile menu items (simplified version of main menu)
 const mobileMenuItems = [
@@ -26,14 +34,39 @@ const mobileMenuItems = [
     path: "/chat",
   },
   {
-    title: "Prayers",
-    icon: Clock,
-    path: "/prayer-time",
+    title: "Nearby Mosques",
+    icon: MapPin,
+    path: "/nearby-places",
+    showInSidebar: false,
+    description: "Find mosques and Islamic centers",
   },
+];
+
+// Additional menu items to show in "More" popover
+const moreMenuItems = [
   {
-    title: "Learn",
+    title: "Learn Islam",
     icon: Book,
     path: "/learn-islam",
+    description: "Explore Islamic teachings",
+  },
+  {
+    title: "Events",
+    icon: Calendar,
+    path: "/events",
+    description: "View upcoming events",
+  },
+  {
+    title: "Prayer Time",
+    icon: Clock,
+    path: "/prayer-time",
+    description: "Check prayer times",
+  },
+  {
+    title: "About IslamGPT",
+    icon: Brain,
+    path: "https://islam-gpt-landing-page.vercel.app/",
+    description: "Learn about IslamGPT",
   },
 ];
 
@@ -54,6 +87,13 @@ const menuItems = [
     description: "Start a conversation",
   },
   {
+    title: "Nearby Mosques",
+    icon: MapPin,
+    path: "/nearby-places",
+    showInSidebar: false,
+    description: "Find mosques and Islamic centers",
+  },
+  {
     title: "Learn Islam",
     icon: Book,
     path: "/learn-islam",
@@ -66,13 +106,6 @@ const menuItems = [
     path: "/events",
     showInSidebar: true,
     description: "View upcoming events",
-  },
-  {
-    title: "Nearby Mosques",
-    icon: MapPin,
-    path: "/nearby-places",
-    showInSidebar: false,
-    description: "Find mosques and Islamic centers",
   },
   {
     title: "Prayer Time",
@@ -130,10 +163,16 @@ const Tooltip = ({ children, content }) => {
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation();
+  const [morePopoverOpen, setMorePopoverOpen] = useState(false);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
+
+  // Check if any of the "more" items is currently active
+  const isMoreActive = moreMenuItems.some(
+    (item) => location.pathname === item.path
+  );
 
   return (
     <>
@@ -219,6 +258,53 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               <span className="text-xs mt-1">{item.title}</span>
             </Link>
           ))}
+
+          {/* More Button with Popover */}
+          <Popover open={morePopoverOpen} onOpenChange={setMorePopoverOpen}>
+            <PopoverTrigger asChild>
+              <button
+                className={`flex flex-col items-center justify-center px-3 py-1 hover:bg-[var(--text-bg-hover)] transition-all duration-300 rounded-md ${
+                  isMoreActive || morePopoverOpen
+                    ? "text-[var(--primary-color)]"
+                    : "text-gray-600"
+                }`}
+              >
+                <MoreHorizontal className="w-4 h-4" />
+                <span className="text-xs mt-1">More</span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-80 p-0 mb-2"
+              side="top"
+              align="end"
+              sideOffset={8}
+            >
+              <div className="p-2">
+                <div className="space-y-1">
+                  {moreMenuItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setMorePopoverOpen(false)}
+                      className={`flex items-center p-3 rounded-lg transition-colors hover:bg-gray-50 ${
+                        location.pathname === item.path
+                          ? "bg-[var(--text-bg)] text-[var(--primary-color)]"
+                          : "text-gray-700"
+                      }`}
+                    >
+                      <item.icon className="w-5 h-5 mr-3 text-gray-500" />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm">{item.title}</div>
+                        <div className="text-xs text-gray-500 truncate">
+                          {item.description}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </nav>
       </div>
     </>

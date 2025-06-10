@@ -2,8 +2,22 @@
 
 import { MapPin, Navigation, Camera } from "lucide-react";
 import { useState } from "react";
+import m1 from "../../../assets/images/mosques/mosque1.jpg";
+import m2 from "../../../assets/images/mosques/mosque2.jpg";
+import m3 from "../../../assets/images/mosques/mosque3.jpg";
+import m4 from "../../../assets/images/mosques/mosque4.jpg";
+import m5 from "../../../assets/images/mosques/mosque5.jpg";
+import m6 from "../../../assets/images/mosques/mosque6.jpg";
+import m7 from "../../../assets/images/mosques/mosque7.jpg";
+import m8 from "../../../assets/images/mosques/mosque8.jpg";
+import m9 from "../../../assets/images/mosques/mosque9.jpg";
+import m10 from "../../../assets/images/mosques/mosque10.jpg";
+import m11 from "../../../assets/images/mosques/mosque11.jpg";
+import m12 from "../../../assets/images/mosques/mosque12.jpg";
 
-const MosqueCard = ({ mosque, distance }) => {
+const mosqueImages = [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12];
+
+const MosqueCard = ({ mosque, distance, index }) => {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
 
@@ -11,33 +25,11 @@ const MosqueCard = ({ mosque, distance }) => {
     return `https://www.google.com/maps/dir/?api=1&destination=${mosque.latitude},${mosque.longitude}`;
   };
 
-  // Generate Google Street View image URL
-  const getStreetViewImage = () => {
-    const apiKey = "AIzaSyBkL_Vpfma-nrNUdarOrwCiGM-QkAgnbe0"; // Replace with your Google API key
-    return `https://maps.googleapis.com/maps/api/streetview?size=400x200&location=${mosque.latitude},${mosque.longitude}&heading=151.78&pitch=-0.76&key=${apiKey}`;
+  const getMosqueImage = () => {
+    // Simply use the index to get the image
+    return mosqueImages[index % mosqueImages.length];
   };
-
-  // Generate Google Places photo URL (alternative approach)
-  const getPlacesPhoto = () => {
-    // This would require a place_id from Google Places API
-    // For now, we'll use a fallback mosque image
-    return `/images/mosque-placeholder.jpg`;
-  };
-
-  // Fallback mosque images array
-  const fallbackImages = [
-    "/images/mosque-1.jpg",
-    "/images/mosque-2.jpg",
-    "/images/mosque-3.jpg",
-    "/images/mosque-4.jpg",
-    "/images/mosque-5.jpg",
-  ];
-
-  // Get a consistent fallback image based on mosque name
-  const getFallbackImage = () => {
-    const index = mosque.name.length % fallbackImages.length;
-    return fallbackImages[index];
-  };
+  console.log("Image URL:", getMosqueImage());
 
   const handleImageError = () => {
     setImageError(true);
@@ -53,23 +45,16 @@ const MosqueCard = ({ mosque, distance }) => {
       {/* Image Section */}
       <div className="relative h-48 overflow-hidden">
         {!imageError ? (
-          <>
-            <img
-              src={!imageError ? getStreetViewImage() : getFallbackImage()}
-              alt={mosque.name}
-              className="w-full h-full object-cover"
-              onError={handleImageError}
-              onLoad={handleImageLoad}
-            />
-
-            {imageLoading && (
-              <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-                <Camera className="h-8 w-8 text-gray-400" />
-              </div>
-            )}
-          </>
+          <img
+            src={getMosqueImage()}
+            alt={mosque.name}
+            className="w-full h-full object-cover"
+            loading="lazy"
+            onError={handleImageError}
+            onLoad={handleImageLoad}
+          />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[var(--primary-dark)] to-[var(--primary-color)] flex items-center justify-center relative">
+          <div className="w-full h-full bg-gradient-to-br from-purple-800 to-purple-600 flex items-center justify-center relative">
             <div className="absolute inset-0 opacity-20 bg-[url('/images/mosque-pattern.png')] bg-repeat"></div>
             <div className="text-center text-white z-10">
               <div className="w-16 h-16 mx-auto mb-2 bg-white/20 rounded-full flex items-center justify-center">
@@ -79,24 +64,6 @@ const MosqueCard = ({ mosque, distance }) => {
             </div>
           </div>
         )}
-
-        {/* Distance Badge */}
-        <div className="absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded-full text-xs font-medium">
-          {distance} km
-        </div>
-
-        {/* Type Badge */}
-        <div className="absolute top-3 left-3">
-          <div
-            className={`px-2 py-1 rounded-full text-xs font-medium ${
-              mosque.type === "node"
-                ? "bg-green-500 text-white"
-                : "bg-orange-500 text-white"
-            }`}
-          >
-            {mosque.type === "node" ? "Nearby" : "Distant"}
-          </div>
-        </div>
       </div>
 
       {/* Content Section */}

@@ -10,6 +10,7 @@ import CryptoJS from "crypto-js";
 import { useNavigate } from "react-router-dom";
 import { clearUser } from "../../features/slices/auth/profile";
 import { clearToken } from "../../features/slices/auth/authSlice";
+import { isTokenValid } from "@/lib/utils";
 // Define unique keys for your project
 const TOKEN_KEY = localStorage_values.TOKEN_KEY;
 const USER_KEY = localStorage_values.USER_KEY;
@@ -62,6 +63,7 @@ export function useLoginMutation() {
 
       // Set token in localStorage and Redux store
       // console.log("the token value is:", response.data.data.access_token);
+      isTokenValid(response.data.data.access_token);
       const encryptedToken = encrypt(response.data.data.access_token);
       localStorage.setItem(TOKEN_KEY, encryptedToken);
       dispatch(setToken(response.data.data.access_token));

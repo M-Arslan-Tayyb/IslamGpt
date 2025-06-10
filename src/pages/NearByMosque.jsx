@@ -199,12 +199,12 @@ const NearByMosque = () => {
   return (
     <div className="min-h-screen bg-[var(--bg-light)] pb-10">
       {/* Hero Section */}
-      <div className="relative h-64 w-full overflow-hidden">
+      <div className="relative h-[450px] w-full overflow-hidden">
         {/* Image as a visible element, not CSS background */}
         <img
           src={nearbyImage}
           alt="Nearby Mosques Background"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-bottom"
         />
 
         {/* Optional pattern overlay */}
@@ -298,6 +298,7 @@ const NearByMosque = () => {
                   mosque.latitude,
                   mosque.longitude
                 )}
+                index={index}
               />
             ))}
           </div>
