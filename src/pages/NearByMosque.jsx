@@ -6,6 +6,7 @@ import { useNearbyMosquesMutation } from "@/apis/NearByMosque/mosque";
 import LocationRequestModal from "@/components/common/LocationRequestModal";
 import MosqueCard from "@/components/core/NearByMosque/MosqueCard";
 import nearbyImage from "../assets/images/general/nearby-background.webp";
+import decorate_image from "../assets/images/dashboard/decorate.svg";
 
 const NearByMosque = () => {
   const [userLocation, setUserLocation] = useState({
@@ -199,40 +200,48 @@ const NearByMosque = () => {
   return (
     <div className="min-h-screen bg-[var(--bg-light)] pb-10">
       {/* Hero Section */}
+
       <div className="relative h-[450px] w-full overflow-hidden">
-        {/* Image as a visible element, not CSS background */}
+        {/* Background Image */}
         <img
           src={nearbyImage}
           alt="Nearby Mosques Background"
-          className="absolute inset-0 w-full h-full object-bottom"
+          className="absolute inset-0 w-full h-full object-cover "
+        />
+
+        {/* Decoration Images */}
+        <img
+          src={decorate_image}
+          alt="Decoration Left"
+          className="absolute top-0 left-0 w-full object-cover h-auto z-30"
         />
 
         {/* Optional pattern overlay */}
-        <div className="absolute inset-0 bg-[url('/images/mosque-pattern.png')] bg-repeat opacity-20"></div>
+        <div className="absolute inset-0 bg-[url('/images/mosque-pattern.png')] bg-repeat opacity-20 z-10"></div>
 
         {/* Text/content on top of the image */}
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-white container mx-auto px-4">
-          <h1 className="text-3xl md:text-4xl font-bold text-center">
-            Nearby Mosques
-          </h1>
-          <p className="mt-2 text-center max-w-md">
-            Find mosques near your current location for prayer.
-          </p>
-          <div className="mt-4 flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-            <MapPin className="h-4 w-4 mr-2" />
-            <span className="text-sm">{getLocationString()}</span>
-            <button
-              onClick={handleRefreshMosques}
-              disabled={nearbyMosquesMutation.isPending}
-              className="ml-2 p-1 rounded-full hover:bg-white/20 disabled:opacity-50"
-              title="Refresh mosques"
-            >
-              <RefreshCw
-                className={`h-4 w-4 ${
-                  nearbyMosquesMutation.isPending ? "animate-spin" : ""
-                }`}
-              />
-            </button>
+        <div className="relative z-40 flex flex-col items-center justify-center h-full text-white container mx-auto px-4">
+          <div className="bg-[hsla(35,92%,95%,0.9)] text-black px-6 py-4 rounded-xl text-center shadow-md">
+            <h1 className="text-2xl md:text-3xl font-bold">Nearby Mosques</h1>
+            <p className="mt-2 max-w-md">
+              Find mosques near your current location for prayer.
+            </p>
+            <div className="mt-4 flex items-center justify-center bg-white/40 backdrop-blur-sm px-4 py-2 rounded-full">
+              <MapPin className="h-4 w-4 mr-2" />
+              <span className="text-sm">{getLocationString()}</span>
+              <button
+                onClick={handleRefreshMosques}
+                disabled={nearbyMosquesMutation.isPending}
+                className="ml-2 p-1 rounded-full hover:bg-white/30 disabled:opacity-50"
+                title="Refresh mosques"
+              >
+                <RefreshCw
+                  className={`h-4 w-4 ${
+                    nearbyMosquesMutation.isPending ? "animate-spin" : ""
+                  }`}
+                />
+              </button>
+            </div>
           </div>
         </div>
       </div>

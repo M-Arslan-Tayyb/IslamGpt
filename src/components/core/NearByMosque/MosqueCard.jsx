@@ -43,12 +43,12 @@ const MosqueCard = ({ mosque, distance, index }) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100">
       {/* Image Section */}
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-48 overflow-hidden group rounded-xl shadow-md">
         {!imageError ? (
           <img
             src={getMosqueImage()}
             alt={mosque.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transform transition duration-500 ease-in-out group-hover:scale-105 group-hover:brightness-110 group-hover:shadow-lg"
             loading="lazy"
             onError={handleImageError}
             onLoad={handleImageLoad}
