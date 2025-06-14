@@ -1,8 +1,0 @@
-import React from "react";
-import ComingSoon from "../components/common/CommingSoon";
-
-const LearnIslam = () => {
-    return <ComingSoon />;
-};
-
-export default LearnIslam;
