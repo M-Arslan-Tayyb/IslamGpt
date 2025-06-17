@@ -18,6 +18,7 @@ export const chat_endpoints = {
   GENERATE_AI: BASE_URL + "/generate",
   GET_LISTING: BASE_URL + "/get-listing",
   GET_HISTORY: BASE_URL + "/get-history",
+  DELETE_SESSION: BASE_URL + "/delete-session",
 };
 
 export const NEARBY_MOSQUES_endpoints = {

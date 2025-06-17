@@ -46,7 +46,7 @@ const mobileMenuItems = [
     title: "Nearby Mosques",
     icon: MapPin,
     path: "/nearby-places",
-    showInSidebar: false,
+    showInSidebar: true,
     description: "Find mosques and Islamic centers",
   },
 ];
@@ -59,12 +59,12 @@ const moreMenuItems = [
     path: "/embrace-islam",
     description: "How to embrace Islam",
   },
-  {
-    title: "Events",
-    icon: Calendar,
-    path: "/events",
-    description: "View upcoming events",
-  },
+  // {
+  //   title: "Events",
+  //   icon: Calendar,
+  //   path: "/events",
+  //   description: "View upcoming events",
+  // },
   {
     title: "Prayer Time",
     icon: Clock,
@@ -99,7 +99,7 @@ const menuItems = [
     title: "Nearby Mosques",
     icon: MapPin,
     path: "/nearby-places",
-    showInSidebar: false,
+    showInSidebar: true,
     description: "Find mosques and Islamic centers",
   },
   {
@@ -109,13 +109,13 @@ const menuItems = [
     showInSidebar: true,
     description: "How to embrace Islam",
   },
-  {
-    title: "Events",
-    icon: Calendar,
-    path: "/events",
-    showInSidebar: true,
-    description: "View upcoming events",
-  },
+  // {
+  //   title: "Events",
+  //   icon: Calendar,
+  //   path: "/events",
+  //   showInSidebar: true,
+  //   description: "View upcoming events",
+  // },
   {
     title: "Prayer Time",
     icon: Clock,
@@ -150,7 +150,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     <>
       <TooltipProvider>
         <aside
-          className="hidden md:flex bg-white h-screen fixed left-0 top-16 border-r border-gray-200 transition-all duration-300 flex-col"
+          className="hidden md:flex bg-white h-screen fixed left-0 z-[1000] top-16 border-r border-gray-200 transition-all duration-300 flex-col"
           style={{ width: isOpen ? "13rem" : "4rem" }}
         >
           <div className="flex flex-col h-full">
@@ -191,7 +191,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                               <item.icon className="w-4 h-4" />
                             </Link>
                           </TooltipTrigger>
-                          <TooltipContent side="right">
+                          <TooltipContent side="right" className="z-[1000]">
                             {item.description}
                           </TooltipContent>
                         </Tooltip>
@@ -239,7 +239,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           <Popover open={morePopoverOpen} onOpenChange={setMorePopoverOpen}>
             <PopoverTrigger asChild>
               <button
-                className={`flex flex-col items-center justify-center px-3 py-1 hover:bg-[var(--text-bg-hover)] transition-all duration-300 rounded-md ${
+                className={`relative z-50 flex flex-col items-center justify-center px-3 py-1 hover:bg-[var(--text-bg-hover)] transition-all duration-300 rounded-md ${
                   isMoreActive || morePopoverOpen
                     ? "text-[var(--primary-color)]"
                     : "text-gray-600"

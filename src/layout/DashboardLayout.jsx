@@ -6,7 +6,7 @@ import Sidebar from "../components/core/dashboard/Sidebar";
 import Footer from "../components/common/Footer";
 
 // Routes that should not show the sidebar
-const routesWithoutSidebar = ["/chat", "/nearby-places"];
+const routesWithoutSidebar = ["/chat"];
 
 const DashboardLayout = () => {
   const location = useLocation();

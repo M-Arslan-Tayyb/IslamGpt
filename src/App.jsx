@@ -31,6 +31,16 @@ function App() {
           element: <Navigate to="/dashboard" replace />,
         },
         {
+          path: "/nearby-places",
+          element: (
+            <PrivateRoute>
+              <ErrorBoundary>
+                <NearByMosque />
+              </ErrorBoundary>
+            </PrivateRoute>
+          ),
+        },
+        {
           path: "/dashboard",
           element: (
             <DashboardRoute>
@@ -91,16 +101,7 @@ function App() {
         </PrivateRoute>
       ),
     },
-    {
-      path: "/nearby-places",
-      element: (
-        <PrivateRoute>
-          <ErrorBoundary>
-            <NearByMosque />
-          </ErrorBoundary>
-        </PrivateRoute>
-      ),
-    },
+
     {
       path: "/login",
       element: (

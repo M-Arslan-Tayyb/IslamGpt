@@ -1,10 +1,11 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { chat_endpoints } from "../apiEndPoints";
 import { apiConnector } from "../apiConnector";
 import { useSelector } from "react-redux";
 
-const { GENERATE_AI, GET_LISTING, GET_HISTORY } = chat_endpoints;
+const { GENERATE_AI, GET_LISTING, GET_HISTORY, DELETE_SESSION } =
+  chat_endpoints;
 
 export function useGenerateAIMutation() {
   const { user } = useSelector((state) => state.profile);
@@ -144,6 +145,36 @@ export function useGetHistoryMutation() {
     onError: (error) => {
       console.error("GET HISTORY ERROR:", error);
       toast.error(error.message || "Failed to get chat history");
+    },
+  });
+}
+
+export function useDeleteSessionMutation() {
+  const { user } = useSelector((state) => state.profile);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ session_id }) => {
+      if (!user?.user_id) {
+        throw new Error("User ID is required");
+      }
+
+      const payload = { session_id: String(session_id) };
+      const response = await apiConnector("POST", DELETE_SESSION, payload);
+
+      if (!response?.data?.succeeded) {
+        throw new Error(response?.data?.message || "Failed to delete session");
+      }
+
+      return response.data;
+    },
+    onSuccess: (_, { session_id }) => {
+      toast.success("Session deleted successfully");
+      // Invalidate or refetch the session list
+      queryClient.invalidateQueries(["chat-history"]);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Error deleting session");
     },
   });
 }

@@ -159,7 +159,7 @@ const NearByMosque = () => {
   // Force location requirement - don't show page content without location
   if (!hasValidLocation) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[var(--bg-light)]">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[var(--bg-light)] ">
         <div className="text-center max-w-md mx-auto">
           <div className="bg-[var(--text-bg)] p-8 rounded-lg shadow-lg">
             <MapPin className="h-20 w-20 mx-auto text-[var(--primary-color)] mb-6" />
@@ -198,16 +198,15 @@ const NearByMosque = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-light)] pb-10">
+    <div className="min-h-screen bg-[var(--bg-light)] pb-10 mt-12">
       {/* Hero Section */}
 
       <div className="relative h-[450px] w-full overflow-hidden">
         {/* Background Image */}
-        <img
-          src={nearbyImage}
-          alt="Nearby Mosques Background"
-          className="absolute inset-0 w-full h-full object-cover "
-        />
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${nearbyImage})` }}
+        ></div>
 
         {/* Decoration Images */}
         <img
@@ -221,7 +220,7 @@ const NearByMosque = () => {
 
         {/* Text/content on top of the image */}
         <div className="relative z-40 flex flex-col items-center justify-center h-full text-white container mx-auto px-4">
-          <div className="bg-[hsla(35,92%,95%,0.9)] text-black px-6 py-4 rounded-xl text-center shadow-md">
+          <div className="bg-[hsla(35,92%,95%,1)] text-black px-6 py-4 rounded-xl text-center shadow-md">
             <h1 className="text-2xl md:text-3xl font-bold">Nearby Mosques</h1>
             <p className="mt-2 max-w-md">
               Find mosques near your current location for prayer.
