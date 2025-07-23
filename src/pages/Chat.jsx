@@ -358,6 +358,7 @@ const Chat = () => {
             <ChatInterface
               onAskQuestion={handleAskQuestion}
               showInitial={true}
+              isPending={generateAIMutation.isPending}
             />
           ) : (
             <div className="bg-white rounded-lg shadow-md w-full min-h-[85vh] relative">
@@ -400,6 +401,7 @@ const Chat = () => {
                   isCompact={true}
                   showInitial={false}
                   disabled={isLoadingHistory}
+                  isPending={generateAIMutation.isPending}
                 />
               </div>
             </div>

@@ -6,6 +6,7 @@ const ChatInterface = ({
   onAskQuestion,
   isCompact = false,
   showInitial = true,
+  isPending = false, // Added to handle pending state
 }) => {
   const [message, setMessage] = useState("");
 
@@ -26,12 +27,18 @@ const ChatInterface = ({
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Ask your question..."
           className="w-full px-4 py-3 pr-12 rounded-lg border border-gray-200 focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] outline-none transition-colors"
+          // 👇 no need to disable this
         />
         <button
           type="submit"
+          disabled={isPending || !message.trim()} // 👈 only disable button
           className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-[var(--primary-color)] hover:text-[var(--secondary-color)] rounded-full transition-colors duration-300"
         >
-          <Send className="w-5 h-5" />
+          {isPending ? (
+            <div className="w-5 h-5 border-2 border-t-transparent border-[var(--primary-color)] rounded-full animate-spin" />
+          ) : (
+            <Send className="w-5 h-5" />
+          )}
         </button>
       </form>
     );

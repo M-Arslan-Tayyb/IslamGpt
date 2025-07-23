@@ -4,62 +4,72 @@ import { chat_endpoints } from "../apiEndPoints";
 import { apiConnector } from "../apiConnector";
 import { useSelector } from "react-redux";
 
-const { GENERATE_AI, GET_LISTING, GET_HISTORY, DELETE_SESSION } =
-  chat_endpoints;
+const {
+  GENERATE_AI,
+  GET_LISTING,
+  GET_HISTORY,
+  DELETE_SESSION,
+  GENERATE_AUDIO,
+} = chat_endpoints;
 
 export function useGenerateAIMutation() {
   const { user } = useSelector((state) => state.profile);
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async ({ query, sessionId }) => {
-      if (!user?.user_id) {
-        throw new Error("User ID is required");
-      }
-
-      const actualSessionId = sessionId;
-
-      console.log("API using session ID:", actualSessionId);
+      if (!user?.user_id) throw new Error("User ID is required");
 
       const payload = {
         query,
         user_id: String(user.user_id),
-        session_id: String(actualSessionId),
+        session_id: String(sessionId),
       };
 
-      console.log("Sending payload to generate AI:", payload);
-
       const response = await apiConnector("POST", GENERATE_AI, payload);
-      console.log(response);
-
-      // Check if the response indicates an error
       if (!response.data.succeeded) {
-        console.error("API returned error:", response.data);
         throw new Error(response.data.message || "Failed to generate response");
       }
 
-      console.log("API returned success:", response.data);
-
-      // Return the session_id along with the response data
       return {
         ...response.data,
-        session_id: actualSessionId,
+        session_id: sessionId,
       };
     },
     onMutate: () => {
-      // Show a loading toast that can be dismissed later
-      // toast.loading("Generating response...", { id: "ai-response" })
+      // Optional: toast.loading("Generating response...", { id: "ai-response" })
     },
     onSuccess: (data) => {
       console.log("AI Response successful:", data);
-      // Dismiss the loading toast and show success
-      // toast.success("Response generated successfully", { id: "ai-response" })
     },
     onError: (error) => {
-      console.error("GENERATE AI ERROR:", error);
-      // Dismiss the loading toast and show error
       toast.error(error.message || "Failed to generate response", {
         id: "ai-response",
       });
+    },
+  });
+
+  return mutation;
+}
+
+export function useGenerateAudioMutation() {
+  return useMutation({
+    mutationFn: async (text) => {
+      const response = await apiConnector(
+        "POST",
+        GENERATE_AUDIO,
+        { text },
+        { Accept: "audio/mpeg" },
+        null,
+        "blob"
+      );
+
+      const audioBlob = new Blob([response.data], { type: "audio/mpeg" });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      return audioUrl;
+    },
+    onError: (err) => {
+      console.error("Audio Generation Error:", err);
+      toast.error("Failed to generate audio");
     },
   });
 }

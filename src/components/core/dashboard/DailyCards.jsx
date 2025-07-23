@@ -6,6 +6,8 @@ import {
   HandIcon as PrayingHands,
 } from "lucide-react";
 import { duaData } from "../../../data/duaData";
+import AudioPlayButton from "@/components/common/AudioPlayButton";
+import { useGenerateAudioMutation } from "@/apis/chat/chatApi";
 
 const Card = ({ title, icon: Icon, children, className = "" }) => {
   return (
@@ -24,6 +26,7 @@ const Card = ({ title, icon: Icon, children, className = "" }) => {
 };
 
 const TextSection = ({ text, translation, className = "" }) => {
+  const { mutate: generateAudio, isPending } = useGenerateAudioMutation();
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -39,17 +42,31 @@ const TextSection = ({ text, translation, className = "" }) => {
   return (
     <div className={`space-y-4 ${className}`}>
       <p className="text-right arabic-text text-[1.4rem] leading-loose text-[var(--primary-color)]">
-        {text}
-        {/* <span className="text-[0.9rem]">۝</span> */}
+        {text}{" "}
+        <span>
+          {/* Audio Button */}
+          <AudioPlayButton
+            text={text}
+            generateAudio={generateAudio}
+            loading={isPending}
+            buttonClass="text-blue-600 hover:text-blue-800 text-sm"
+          />
+        </span>
       </p>
+
       <p className="text-gray-600 text-sm">{translation}</p>
-      <button
-        onClick={handleCopy}
-        className="flex items-center gap-2 text-sm text-gray-500 hover:text-[var(--primary-color)] transition-colors"
-      >
-        <Copy className="w-4 h-4" />
-        {copied ? "Copied!" : "Copy"}
-      </button>
+
+      {/* Buttons Row */}
+      <div className="flex justify-between items-center">
+        {/* Copy Button */}
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-2 text-sm text-gray-500 hover:text-[var(--primary-color)] transition-colors"
+        >
+          <Copy className="w-4 h-4" />
+          {copied ? "Copied!" : "Copy"}
+        </button>
+      </div>
     </div>
   );
 };
