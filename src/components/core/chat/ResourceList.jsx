@@ -1,6 +1,7 @@
 import AudioPlayButton from "@/components/common/AudioPlayButton";
 import { useGenerateAudioMutation } from "@/apis/chat/chatApi";
 import FormattedText from "./FormatedText";
+import LoadingSkeleton from "@/components/common/LoadingSkelton";
 
 const ResourceList = ({ aiResponse, isLoading }) => {
   const { mutate: generateAudio, isPending } = useGenerateAudioMutation();

@@ -43,15 +43,6 @@ const TextSection = ({ text, translation, className = "" }) => {
     <div className={`space-y-4 ${className}`}>
       <p className="text-right arabic-text text-[1.4rem] leading-loose text-[var(--primary-color)]">
         {text}{" "}
-        <span>
-          {/* Audio Button */}
-          <AudioPlayButton
-            text={text}
-            generateAudio={generateAudio}
-            loading={isPending}
-            buttonClass="text-blue-600 hover:text-blue-800 text-sm"
-          />
-        </span>
       </p>
 
       <p className="text-gray-600 text-sm">{translation}</p>
@@ -66,6 +57,15 @@ const TextSection = ({ text, translation, className = "" }) => {
           <Copy className="w-4 h-4" />
           {copied ? "Copied!" : "Copy"}
         </button>
+        <div>
+          {/* Audio Button */}
+          <AudioPlayButton
+            text={translation}
+            generateAudio={generateAudio}
+            loading={isPending}
+            buttonClass="text-blue-600 hover:text-blue-800 text-sm"
+          />
+        </div>
       </div>
     </div>
   );

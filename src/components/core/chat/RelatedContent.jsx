@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronRight, Book, MessageCircle, X, Maximize2 } from 'lucide-react';
+import { ChevronRight, Book, MessageCircle, X, Maximize2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import LoadingSkeleton from "@/components/common/LoadingSkelton";
+import AudioPlayButton from "@/components/common/AudioPlayButton";
+import { useGenerateAudioMutation } from "@/apis/chat/chatApi";
 
 const MetadataBadge = ({ children }) => (
   <Badge
@@ -30,7 +32,9 @@ const MetadataBadge = ({ children }) => (
 const getContentId = (item) => {
   if (!item) return "";
   if (item.type === "Hadith") {
-    return `hadith-${item.hadith_reference || ""}-${item.hadith_book_name || ""}`;
+    return `hadith-${item.hadith_reference || ""}-${
+      item.hadith_book_name || ""
+    }`;
   } else {
     return `quran-${item.surah_name || ""}-${item.ayah_no || ""}`;
   }
@@ -40,6 +44,7 @@ const ContentCard = ({ item, allContent, currentItem, onNavigate }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [dialogItem, setDialogItem] = useState(item);
+  const { mutate: generateAudio, isPending } = useGenerateAudioMutation();
 
   useEffect(() => {
     if (isModalOpen) {
@@ -79,8 +84,9 @@ const ContentCard = ({ item, allContent, currentItem, onNavigate }) => {
           setIsModalOpen(true);
           onNavigate(item);
         }}
-        className={`bg-white hover:bg-[var(--text-bg)] rounded-lg p-3 cursor-pointer transition-all border border-gray-200 hover:border-[var(--primary-color)] hover:shadow-sm ${isSelected ? "border-[var(--primary-color)] bg-[var(--text-bg)]" : ""
-          }`}
+        className={`bg-white hover:bg-[var(--text-bg)] rounded-lg p-3 cursor-pointer transition-all border border-gray-200 hover:border-[var(--primary-color)] hover:shadow-sm ${
+          isSelected ? "border-[var(--primary-color)] bg-[var(--text-bg)]" : ""
+        }`}
       >
         <p className="text-sm text-gray-600">
           {truncateText(getContentText(item))}
@@ -127,8 +133,12 @@ const ContentCard = ({ item, allContent, currentItem, onNavigate }) => {
                 </>
               ) : (
                 <>
-                  <MetadataBadge>Surah: {dialogItem.surah_name || "N/A"}</MetadataBadge>
-                  <MetadataBadge>Verse: {dialogItem.ayah_no || "N/A"}</MetadataBadge>
+                  <MetadataBadge>
+                    Surah: {dialogItem.surah_name || "N/A"}
+                  </MetadataBadge>
+                  <MetadataBadge>
+                    Verse: {dialogItem.ayah_no || "N/A"}
+                  </MetadataBadge>
                 </>
               )}
             </div>
@@ -152,6 +162,15 @@ const ContentCard = ({ item, allContent, currentItem, onNavigate }) => {
                   <p className="text-gray-600 leading-relaxed">
                     {getContentText(dialogItem)}
                   </p>
+                  <div>
+                    {/* Audio Button */}
+                    <AudioPlayButton
+                      text={getContentText(dialogItem)}
+                      generateAudio={generateAudio}
+                      loading={isPending}
+                      buttonClass="text-blue-600 hover:text-blue-800 text-sm"
+                    />
+                  </div>
                 </div>
                 {dialogItem.type === "Quran" && (
                   <div className="space-y-2">
@@ -173,19 +192,25 @@ const ContentCard = ({ item, allContent, currentItem, onNavigate }) => {
               </h3>
               <div className="space-y-3">
                 {allContent
-                  .filter((content) => content && content.type === dialogItem.type)
+                  .filter(
+                    (content) => content && content.type === dialogItem.type
+                  )
                   .map((content, idx) => (
                     <div
                       key={idx}
                       onClick={() => {
-                        console.log("Sidebar item clicked:", getContentId(content));
+                        console.log(
+                          "Sidebar item clicked:",
+                          getContentId(content)
+                        );
                         setDialogItem(content);
                         onNavigate(content);
                       }}
-                      className={`p-3 rounded-lg cursor-pointer transition-all ${getContentId(content) === getContentId(dialogItem)
-                        ? "bg-[var(--primary-color)] text-white"
-                        : "bg-white hover:bg-[var(--text-bg)]"
-                        }`}
+                      className={`p-3 rounded-lg cursor-pointer transition-all ${
+                        getContentId(content) === getContentId(dialogItem)
+                          ? "bg-[var(--primary-color)] text-white"
+                          : "bg-white hover:bg-[var(--text-bg)]"
+                      }`}
                     >
                       <p className="text-sm">
                         {truncateText(getContentText(content), 60)}
@@ -224,8 +249,12 @@ const RelatedContent = ({ content, isLoading }) => {
   }
 
   // Add additional checks to prevent errors
-  if (!content || !content.quran || !content.hadith ||
-    (content.quran.length === 0 && content.hadith.length === 0)) {
+  if (
+    !content ||
+    !content.quran ||
+    !content.hadith ||
+    (content.quran.length === 0 && content.hadith.length === 0)
+  ) {
     return null;
   }
 
