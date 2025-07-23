@@ -159,10 +159,12 @@ const AudioPlayButton = ({
           <Square className={`w-${iconSize} h-${iconSize}`} />
           Stop
         </>
+      ) : loading ? (
+        <div className="w-5 h-5 border-2 border-t-transparent border-[var(--primary-color)] rounded-full animate-spin" />
       ) : (
         <>
           <Volume2 className={`w-${iconSize} h-${iconSize}`} />
-          {loading ? "Loading..." : "Play Audio"}
+          Read Aloud
         </>
       )}
     </button>
