@@ -314,7 +314,6 @@ const Chat = () => {
       toast.error("Failed to generate response. Please try again.");
     }
   };
-
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-gray)]">
       <Header />
