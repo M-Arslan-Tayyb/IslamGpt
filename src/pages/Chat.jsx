@@ -28,7 +28,6 @@ const Chat = () => {
   );
   const [sessions, setSessions] = useState([]);
 
-  // Use a ref to store the current session ID to avoid race conditions
   const sessionIdRef = useRef(chatId || null);
   // Also keep a state for UI updates
   const [activeSessionId, setActiveSessionId] = useState(chatId);
