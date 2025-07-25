@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import ChatInterface from "../components/common/ChatInterface";
@@ -18,6 +17,7 @@ import toast from "react-hot-toast";
 
 const Chat = () => {
   const location = useLocation();
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const chatId = searchParams.get("chatId");
@@ -26,12 +26,18 @@ const Chat = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(
     window.innerWidth < 768
   );
-  const [sessions, setSessions] = useState([]); // This will be populated from API
+  const [sessions, setSessions] = useState([]);
 
   // Use a ref to store the current session ID to avoid race conditions
   const sessionIdRef = useRef(chatId || null);
   // Also keep a state for UI updates
   const [activeSessionId, setActiveSessionId] = useState(chatId);
+
+  // Track which sessions are truly new (just created)
+  const [newlyCreatedSessions, setNewlyCreatedSessions] = useState(new Set());
+
+  // ADDED: Track if we've processed the dashboard query to prevent duplicate calls
+  const [dashboardQueryProcessed, setDashboardQueryProcessed] = useState(false);
 
   // Existing state
   const [chatHistory, setChatHistory] = useState([]);
@@ -70,7 +76,7 @@ const Chat = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Process sessions data when it's available
+  // FIXED: Simplified session loading and dashboard query handling
   useEffect(() => {
     if (listingData?.succeeded && listingData.data) {
       console.log("Listing data received:", listingData);
@@ -81,36 +87,82 @@ const Chat = () => {
         title: session.title || getFirstQuestion(session.history) || "New Chat",
         history: session.history,
       }));
+
       setSessions(formattedSessions);
 
-      // If chatId is provided in URL, select that session
+      // Handle different navigation scenarios
       if (chatId) {
+        // URL has chatId - this is an existing session
         console.log("Setting active session from URL:", chatId);
         setActiveSessionId(chatId);
         sessionIdRef.current = chatId;
         fetchSessionHistory(chatId);
-      }
-      // If no chatId and we're navigating to the chat page directly, create a new chat
-      else if (!sessionIdRef.current || location.pathname === "/chat") {
-        // Create a new chat instead of selecting the first session
+      } else if (location.state?.query && !dashboardQueryProcessed) {
+        // Coming from dashboard with a query
+        console.log("Processing dashboard query:", location.state.query);
+        handleDashboardQuery(location.state.query);
+        setDashboardQueryProcessed(true);
+      } else if (!sessionIdRef.current) {
+        // No session ID and no dashboard query - create new chat
         handleNewChat();
       }
-    } else if (listingData) {
-      console.log("Listing data format unexpected:", listingData);
     }
-  }, [listingData]);
+  }, [listingData, dashboardQueryProcessed]);
 
-  // Fetch session history when chatId changes
+  // SIMPLIFIED: Handle URL changes for existing sessions only
   useEffect(() => {
-    if (chatId && chatId !== sessionIdRef.current) {
+    if (chatId && chatId !== sessionIdRef.current && !location.state?.query) {
       console.log("URL chatId changed, updating active session:", chatId);
       setActiveSessionId(chatId);
       sessionIdRef.current = chatId;
       fetchSessionHistory(chatId);
-    } else if (location.state?.query) {
-      handleAskQuestion(location.state.query);
     }
-  }, [chatId, location.state]);
+  }, [chatId]);
+
+  // FIXED: Simplified dashboard query handler
+  const handleDashboardQuery = (query) => {
+    console.log("🚀 Handling dashboard query:", query);
+
+    // Create a new session for the dashboard query
+    const newSessionId = Math.floor(
+      10000000 + Math.random() * 90000000
+    ).toString();
+
+    console.log("📝 Creating new session for dashboard query:", newSessionId);
+
+    // Mark this session as newly created
+    setNewlyCreatedSessions((prev) => {
+      const newSet = new Set([...prev, newSessionId]);
+      console.log("🏷️ Newly created sessions:", Array.from(newSet));
+      return newSet;
+    });
+
+    // Update session state
+    setActiveSessionId(newSessionId);
+    sessionIdRef.current = newSessionId;
+
+    // Clear current chat
+    setChatHistory([]);
+    setCurrentQuery(null);
+
+    // Update URL to include the new session ID
+    navigate(`/chat?chatId=${newSessionId}`, { replace: true });
+
+    // Add the new session to the sessions list immediately with "New Chat" title
+    setSessions((prevSessions) => [
+      ...prevSessions,
+      {
+        id: newSessionId,
+        title: "New Chat",
+        history: [],
+      },
+    ]);
+
+    // Process the query - this will update the title
+    setTimeout(() => {
+      handleAskQuestion(query);
+    }, 100); // Small delay to ensure state is updated
+  };
 
   // Function to fetch session history
   const fetchSessionHistory = async (sessionId) => {
@@ -120,7 +172,7 @@ const Chat = () => {
     try {
       const result = await getHistoryMutation.mutateAsync(sessionId);
       if (result.succeeded && result.data) {
-        loadSessionHistory(result.data);
+        loadSessionHistory(result.data, sessionId);
       }
     } catch (error) {
       console.error("Failed to fetch session history:", error);
@@ -131,11 +183,10 @@ const Chat = () => {
   };
 
   // Helper function to load session history
-  const loadSessionHistory = (sessionData) => {
+  const loadSessionHistory = (sessionData, sessionId) => {
     if (!sessionData.history) return;
 
     const formattedHistory = sessionData.history.map((item) => {
-      // Extract question and answer from the format "user_question: text" and "AI_answer: text"
       const query = item.question.replace("user_question: ", "");
       const aiResponse = item.answer.replace("AI_answer: ", "");
 
@@ -162,6 +213,41 @@ const Chat = () => {
     });
 
     setChatHistory(formattedHistory);
+
+    // Update sessions with loaded history
+    setSessions((prevSessions) => {
+      const existingIndex = prevSessions.findIndex(
+        (s) => String(s.id) === String(sessionId)
+      );
+
+      if (existingIndex !== -1) {
+        const updatedSessions = [...prevSessions];
+        const existingSession = prevSessions[existingIndex];
+
+        updatedSessions[existingIndex] = {
+          ...existingSession,
+          history: formattedHistory,
+          title:
+            existingSession.title ||
+            getFirstQuestion(sessionData.history) ||
+            "New Chat",
+        };
+
+        return updatedSessions;
+      } else {
+        return [
+          ...prevSessions,
+          {
+            id: sessionId,
+            title:
+              sessionData.title ||
+              getFirstQuestion(sessionData.history) ||
+              "New Chat",
+            history: formattedHistory,
+          },
+        ];
+      }
+    });
   };
 
   useEffect(() => {
@@ -176,39 +262,37 @@ const Chat = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
-  // Handle new chat
+  // Handle new chat - mark session as newly created
   const handleNewChat = () => {
-    // Generate an 8-digit random number
     const newSessionId = Math.floor(
       10000000 + Math.random() * 90000000
     ).toString();
+
     console.log("Creating new chat with session ID:", newSessionId);
 
-    // Update both the state and the ref
+    setNewlyCreatedSessions((prev) => new Set([...prev, newSessionId]));
+
     setActiveSessionId(newSessionId);
     sessionIdRef.current = newSessionId;
 
-    // Clear the current chat
     setChatHistory([]);
     setCurrentQuery(null);
 
-    // Update the URL without triggering a full navigation
     navigate(`/chat?chatId=${newSessionId}`, { replace: true });
-
-    // Open sidebar when creating a new chat
     setIsSidebarCollapsed(false);
   };
-  // Handle session selection
+
+  // Handle session selection - this is for EXISTING sessions
   const handleSelectSession = (sessionId) => {
     if (sessionId === sessionIdRef.current) return;
 
-    console.log("Selecting session:", sessionId);
+    console.log("Selecting EXISTING session:", sessionId);
+
     navigate(`/chat?chatId=${sessionId}`);
     setActiveSessionId(sessionId);
     sessionIdRef.current = sessionId;
     fetchSessionHistory(sessionId);
 
-    // On mobile, collapse sidebar after selection
     if (window.innerWidth < 768) {
       setIsSidebarCollapsed(true);
     }
@@ -218,26 +302,23 @@ const Chat = () => {
   const getFirstQuestion = (history) => {
     if (!history || history.length === 0) return null;
     const firstQuestion = history[0].question;
-    // Extract just the question part from "user_question: actual question"
     return firstQuestion.replace("user_question: ", "");
   };
 
-  // Handle ask question
+  // FIXED: Better session management in handleAskQuestion
   const handleAskQuestion = async (query) => {
+    console.log("🔄 Processing question:", query);
     setCurrentQuery({ query, response: null, relatedContent: null });
 
     try {
-      // Get the current session ID from the ref to avoid race conditions
       const currentSessionId = sessionIdRef.current;
-
-      console.log("Sending message with session ID:", currentSessionId);
+      console.log("📤 Sending message with session ID:", currentSessionId);
 
       const data = await generateAIMutation.mutateAsync({
         query,
         sessionId: currentSessionId,
       });
 
-      // If the API returns a session ID and we don't have one, update it
       if (data.session_id && !currentSessionId) {
         console.log("Received new session ID from API:", data.session_id);
         setActiveSessionId(data.session_id);
@@ -267,64 +348,119 @@ const Chat = () => {
       };
 
       setChatHistory((prevHistory) => [...prevHistory, newHistoryItem]);
+
+      // FIXED: Update sessions with proper title logic
       setSessions((prevSessions) => {
         const existingIndex = prevSessions.findIndex(
-          (s) => s.id === sessionIdRef.current
+          (s) => String(s.id) === String(sessionIdRef.current)
         );
+
+        console.log("📋 Session update - Looking for:", sessionIdRef.current);
+        console.log("📋 Found at index:", existingIndex);
 
         if (existingIndex !== -1) {
           const existingSession = prevSessions[existingIndex];
+          const updatedSessions = [...prevSessions];
 
-          // Only update the title if it's still "New Chat"
-          if (
+          const isNewlyCreatedSession = newlyCreatedSessions.has(
+            String(sessionIdRef.current)
+          );
+          const currentHistory = existingSession.history || [];
+          const isFirstMessage = currentHistory.length === 0;
+          const hasDefaultTitle =
+            !existingSession.title ||
             existingSession.title === "New Chat" ||
-            !existingSession.title?.trim()
-          ) {
-            const updatedSessions = [...prevSessions];
+            existingSession.title.trim() === "";
+
+          console.log("🏷️ Title decision:", {
+            sessionId: sessionIdRef.current,
+            isNewlyCreatedSession,
+            isFirstMessage,
+            hasDefaultTitle,
+            currentTitle: existingSession.title,
+            willUpdate:
+              isNewlyCreatedSession && isFirstMessage && hasDefaultTitle,
+          });
+
+          if (isNewlyCreatedSession && isFirstMessage && hasDefaultTitle) {
+            // Update title for new session
             updatedSessions[existingIndex] = {
               ...existingSession,
-              title: query,
-              history: [...(existingSession.history || []), newHistoryItem],
+              title: query.length > 50 ? query.substring(0, 50) + "..." : query,
+              history: [...currentHistory, newHistoryItem],
             };
-            return updatedSessions;
+
+            // Remove from newly created sessions
+            setNewlyCreatedSessions((prev) => {
+              const newSet = new Set(prev);
+              newSet.delete(String(sessionIdRef.current));
+              return newSet;
+            });
+
+            console.log("✅ Updated title to:", query);
+          } else {
+            // Keep existing title
+            updatedSessions[existingIndex] = {
+              ...existingSession,
+              history: [...currentHistory, newHistoryItem],
+            };
+            console.log("❌ Kept existing title:", existingSession.title);
           }
 
-          // No change needed if title already exists
-          return prevSessions;
-        }
+          return updatedSessions;
+        } else {
+          // Session not found - add it
+          console.warn("⚠️ Session not found, adding new one");
 
-        // Add brand new session
-        return [
-          ...prevSessions,
-          {
-            id: sessionIdRef.current,
-            title: query,
-            history: [newHistoryItem],
-          },
-        ];
+          const isNewlyCreatedSession = newlyCreatedSessions.has(
+            String(sessionIdRef.current)
+          );
+
+          if (isNewlyCreatedSession) {
+            setNewlyCreatedSessions((prev) => {
+              const newSet = new Set(prev);
+              newSet.delete(String(sessionIdRef.current));
+              return newSet;
+            });
+
+            return [
+              ...prevSessions,
+              {
+                id: sessionIdRef.current,
+                title:
+                  query.length > 50 ? query.substring(0, 50) + "..." : query,
+                history: [newHistoryItem],
+              },
+            ];
+          } else {
+            return [
+              ...prevSessions,
+              {
+                id: sessionIdRef.current,
+                title: "Chat Session",
+                history: [newHistoryItem],
+              },
+            ];
+          }
+        }
       });
 
       setCurrentQuery(null);
-
-      // After sending a message, refresh the sessions list to get the updated data
-      // refetchSessions();
     } catch (error) {
       console.error("Failed to generate response:", error);
       setCurrentQuery(null);
       toast.error("Failed to generate response. Please try again.");
     }
   };
+
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-gray)]">
       <Header />
       <main className="flex-grow pt-16 flex relative">
-        {/* Sidebar with transition */}
         <div
           className={cn(
             "fixed md:relative z-20 h-[calc(100vh-64px)] bg-white transition-all duration-300 ease-in-out",
-            isSidebarCollapsed
-              ? "w-[60px]" // Changed to show a thin strip instead of completely hiding
-              : "w-[280px]"
+            isSidebarCollapsed ? "w-[60px]" : "w-[280px]"
           )}
         >
           <ChatSidebar
@@ -338,21 +474,19 @@ const Chat = () => {
           />
         </div>
 
-        {/* Main chat area with proper spacing */}
         <div
           className={cn(
             "flex-1 transition-all duration-300 ease-in-out p-4",
-            isSidebarCollapsed
-              ? "ml-[60px]" // Adjusted margin to match collapsed sidebar width
-              : "ml-0"
+            isSidebarCollapsed ? "ml-[60px]" : "ml-0"
           )}
         >
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
             <p className="text-sm text-amber-800 font-medium">
-              ⚠️ IslamGpt can make mistakes. Please cross-verify the
-              response for accuracy.
+              ⚠️ IslamGpt can make mistakes. Please cross-verify the response
+              for accuracy.
             </p>
           </div>
+
           {chatHistory.length === 0 && !currentQuery && !isLoadingHistory ? (
             <ChatInterface
               onAskQuestion={handleAskQuestion}
@@ -372,28 +506,23 @@ const Chat = () => {
                 ) : (
                   <>
                     {chatHistory.map((item, index) => (
-                      <>
-                        <ChatMessage
-                          key={index}
-                          query={item.query}
-                          response={item.response}
-                          isLoading={false}
-                        />
-                      </>
+                      <ChatMessage
+                        key={index}
+                        query={item.query}
+                        response={item.response}
+                        isLoading={false}
+                      />
                     ))}
                     {currentQuery && (
-                      <>
-                        <ChatMessage
-                          query={currentQuery.query}
-                          response={null}
-                          isLoading={true}
-                        />
-                      </>
+                      <ChatMessage
+                        query={currentQuery.query}
+                        response={null}
+                        isLoading={true}
+                      />
                     )}
                   </>
                 )}
               </div>
-
               <div className="absolute bottom-0 left-0 w-full border-t border-gray-200 bg-white p-4">
                 <ChatInterface
                   onAskQuestion={handleAskQuestion}
